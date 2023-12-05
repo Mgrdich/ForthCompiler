@@ -27,6 +27,9 @@ func isDecimal(ch rune) bool { return '0' <= ch && ch <= '9' }
 func isLetter(ch rune) bool {
 	return 'a' <= lower(ch) && lower(ch) <= 'z' || ch == '_' || ch >= utf8.RuneSelf && unicode.IsLetter(ch)
 }
+func isDigit(ch rune) bool {
+	return isDecimal(ch) || ch >= utf8.RuneSelf && unicode.IsDigit(ch)
+}
 
 // Tokenize will tokenize the whole file
 func (lex *Lexer) Tokenize() {
@@ -114,11 +117,48 @@ func (lex *Lexer) peekNextCh() rune {
 }
 
 func (lex *Lexer) scanIdentifier() token.Token {
-	return token.INTEGER
+	builtWord := []rune{lex.getRune()}
+
+	for lex.nextCh() && (isLetter(lex.getRune()) || isDigit(lex.getRune())) {
+		builtWord = append(builtWord, lex.getRune())
+	}
+
+	str := string(builtWord)
+
+	return token.Lookup(str)
+}
+
+func (lex *Lexer) digits(builtNumber *[]rune, state token.Token) token.Token {
+	tokenState := state
+	m := rune('0' + 10)
+	for lex.nextCh() && isDecimal(lex.getRune()) {
+		if lex.getRune() >= m {
+			tokenState = token.ILLEGAL
+		}
+		*builtNumber = append(*builtNumber, lex.getRune())
+	}
+	return tokenState
 }
 
 func (lex *Lexer) scanNumber() token.Token {
-	return token.INTEGER
+	tok := token.ILLEGAL
+	builtNumber := []rune{lex.getRune()} // TODO research where we can keep it as byte
+
+	peekedNextCh := lex.peekNextCh()
+
+	if peekedNextCh != '.' {
+		tok = token.INTEGER
+		tok = lex.digits(&builtNumber, tok)
+	}
+
+	if peekedNextCh == '.' {
+		builtNumber = append(builtNumber, lex.getRune()) // add the dot notation
+		lex.nextCh()
+		tok = token.FLOAT
+		lex.digits(&builtNumber, tok)
+	}
+
+	return tok
 }
 
 // getNextToken this will tokenize by iterating between spaces
