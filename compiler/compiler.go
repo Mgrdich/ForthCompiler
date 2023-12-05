@@ -30,10 +30,16 @@ func (compiler *Compiler) Compile() {
 	lex.Tokenize()
 
 	pars := parser.GetParser(lex.Tokens)
-	pars.Parse() // TODO return error if needed
+	err := pars.Parse() // TODO return error if needed
+
+	if err != nil {
+		panic(err)
+	}
 
 	gen := generator.GetGenerator()
 	gen.Generate()
+
+	// TODO linker job and system call after the assembly file creation
 }
 
 func GetCompiler() *Compiler {

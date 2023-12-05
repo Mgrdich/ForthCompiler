@@ -124,3 +124,7 @@ func (tok Token) IsNumber() bool {
 // IsKeyword returns true for tokens corresponding to keywords;
 // it returns false otherwise.
 func (tok Token) IsKeyword() bool { return keywordBeg < tok && tok < keywordEnd }
+
+func (tok Token) IsIllegal() bool {
+	return tok == ILLEGAL
+}

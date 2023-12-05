@@ -10,8 +10,8 @@ import (
 )
 
 type LexToken struct {
-	tok token.Token
-	lit string
+	Tok token.Token
+	Lit string
 }
 
 type Lexer struct {
@@ -55,8 +55,8 @@ func (lex *Lexer) scanStart() {
 	for lex.scanner.Scan() {
 		tok, lit := lex.getNextToken()
 		lex.Tokens = append(lex.Tokens, LexToken{
-			tok: tok,
-			lit: lit,
+			Tok: tok,
+			Lit: lit,
 		})
 	}
 
@@ -207,6 +207,11 @@ func (lex *Lexer) getNextToken() (token.Token, string) {
 		lex.nextCh()
 		if lex.getRune() == 's' {
 			tok = token.PRINT
+		}
+	case c == '-':
+		lex.nextCh()
+		if isDecimal(lex.getRune()) {
+			tok = lex.scanNumber()
 		}
 	}
 
