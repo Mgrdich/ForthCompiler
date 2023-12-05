@@ -1,7 +1,5 @@
 package token
 
-import "unicode"
-
 // Token is the set of lexical tokens of our created language
 type Token int
 
@@ -34,6 +32,8 @@ const (
 	SUB
 	MUL
 	QUO
+
+	operatorKeywordBeg
 	REM
 	NEGATE
 	ABS
@@ -48,10 +48,11 @@ const (
 	OVER
 	ROLL
 	PICK
+	operatorKeywordEnd
+
 	COLON
 	DOT
 	SEMICOLON
-	COMMA
 	operatorEnd
 )
 
@@ -84,7 +85,6 @@ var tokens = [...]string{
 	DOT:       ".",
 	SEMICOLON: ";",
 	COLON:     ":",
-	COMMA:     ",",
 }
 
 var keywords map[string]Token
@@ -92,6 +92,10 @@ var keywords map[string]Token
 func init() {
 	keywords = make(map[string]Token)
 	for i := keywordBeg + 1; i < keywordEnd; i++ {
+		keywords[tokens[i]] = i
+	}
+
+	for i := operatorKeywordBeg + 1; i < operatorKeywordEnd; i++ {
 		keywords[tokens[i]] = i
 	}
 }
@@ -122,24 +126,3 @@ func (tok Token) IsNumber() bool {
 // IsKeyword returns true for tokens corresponding to keywords;
 // it returns false otherwise.
 func (tok Token) IsKeyword() bool { return keywordBeg < tok && tok < keywordEnd }
-
-// IsKeyword reports whether name is a Forth Keyword, such as "func" or "return".
-func IsKeyword(name string) bool {
-	_, ok := keywords[name]
-	return ok
-}
-
-// IsIdentifier reports whether name is a our language identifier, that is, a non-empty
-// string made up of letters, digits, and underscores, where the first character
-// is not a digit. Keywords are not identifiers.
-func IsIdentifier(name string) bool {
-	if name == "" || IsKeyword(name) {
-		return false
-	}
-	for i, c := range name {
-		if !unicode.IsLetter(c) && c != '_' && (i == 0 || !unicode.IsDigit(c)) {
-			return false
-		}
-	}
-	return true
-}

@@ -59,6 +59,11 @@ func (lex *Lexer) scanStart() {
 			lit: lit,
 		})
 	}
+
+	lex.Tokens = append(lex.Tokens, LexToken{
+		tok: token.EOF,
+		lit: "",
+	})
 	fmt.Println(lex.Tokens)
 }
 
@@ -148,15 +153,15 @@ func (lex *Lexer) scanNumber() token.Token {
 
 	if peekedNextCh != '.' {
 		tok = token.INTEGER
-		tok = lex.digits(&builtNumber, tok)
 	}
 
 	if peekedNextCh == '.' {
 		builtNumber = append(builtNumber, lex.getRune()) // add the dot notation
 		lex.nextCh()
 		tok = token.FLOAT
-		lex.digits(&builtNumber, tok)
 	}
+
+	tok = lex.digits(&builtNumber, tok)
 
 	return tok
 }
@@ -204,7 +209,7 @@ func (lex *Lexer) getNextToken() (token.Token, string) {
 	case c == '.':
 		// move
 		lex.nextCh()
-		if c == lex.getRune() {
+		if lex.getRune() == 's' {
 			tok = token.PRINT
 		}
 	}
