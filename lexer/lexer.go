@@ -60,10 +60,6 @@ func (lex *Lexer) scanStart() {
 		})
 	}
 
-	lex.Tokens = append(lex.Tokens, LexToken{
-		tok: token.EOF,
-		lit: "",
-	})
 	fmt.Println(lex.Tokens)
 }
 
@@ -217,10 +213,10 @@ func (lex *Lexer) getNextToken() (token.Token, string) {
 	return tok, lex.scanner.Text()
 }
 
-func GetLexer(directory string) Lexer {
+func GetLexer(directory string) *Lexer {
 	if len(directory) == 0 {
 		panic("directory is not defined")
 	}
 
-	return Lexer{directory: directory}
+	return &Lexer{directory: directory}
 }

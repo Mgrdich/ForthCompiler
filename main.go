@@ -1,9 +1,9 @@
 package main
 
-import "CompilerPlayground/lexer"
+import "CompilerPlayground/compiler"
 
 func main() {
-	lex := lexer.GetLexer("./test1")
-
-	lex.Tokenize()
+	cr := compiler.GetCompiler()
+	cr.SetDirectory("./test1.mf")
+	cr.Compile()
 }

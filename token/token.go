@@ -9,7 +9,6 @@ const (
 	// Special tokens
 
 	ILLEGAL Token = iota
-	EOF
 
 	//  Identifiers and basic type literals
 	// (these tokens stand for classes of literals)
@@ -59,7 +58,6 @@ const (
 var tokens = [...]string{
 
 	ILLEGAL: "ILLEGAL",
-	EOF:     "EOF",
 
 	PRINT: ".s",
 	IDENT: "IDENT",
