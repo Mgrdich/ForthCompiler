@@ -132,8 +132,8 @@ func (lex *Lexer) scanIdentifier() token.Token {
 func (lex *Lexer) digits(builtNumber *[]rune, state token.Token) token.Token {
 	tokenState := state
 	m := rune('0' + 10)
-	for lex.nextCh() && isDecimal(lex.getRune()) {
-		if lex.getRune() >= m {
+	for lex.nextCh() {
+		if lex.getRune() >= m || !isDecimal(lex.getRune()) {
 			tokenState = token.ILLEGAL
 		}
 		*builtNumber = append(*builtNumber, lex.getRune())

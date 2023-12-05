@@ -7,18 +7,19 @@ import (
 )
 
 type Parser struct {
-	tokens []lexer.LexToken
+	Tokens []lexer.LexToken
 }
 
 func (parser *Parser) Parse() error {
-	if len(parser.tokens) == 0 {
+	if len(parser.Tokens) == 0 {
 		panic("no items in the tokens")
 	}
 
 	var errorBuffer strings.Builder
-	for _, item := range parser.tokens {
+	for _, item := range parser.Tokens {
 		if item.Tok.IsIllegal() {
 			errorBuffer.WriteString(item.Lit)
+			errorBuffer.WriteString(" ,")
 		}
 	}
 
@@ -26,9 +27,9 @@ func (parser *Parser) Parse() error {
 		return nil
 	}
 
-	return errors.New("Illegal Tokens: " + errorBuffer.String())
+	return errors.New("Illegal Tokens: " + errorBuffer.String()[:errorBuffer.Len()-1])
 }
 
-func GetParser(tokens []lexer.LexToken) *Parser {
-	return &Parser{tokens: tokens}
+func GetParser() *Parser {
+	return &Parser{}
 }

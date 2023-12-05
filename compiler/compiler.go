@@ -29,14 +29,16 @@ func (compiler *Compiler) Compile() {
 	lex := lexer.GetLexer(compiler.directory)
 	lex.Tokenize()
 
-	pars := parser.GetParser(lex.Tokens)
-	err := pars.Parse() // TODO return error if needed
+	pars := parser.GetParser()
+	pars.Tokens = lex.Tokens
+	err := pars.Parse()
 
 	if err != nil {
 		panic(err)
 	}
 
 	gen := generator.GetGenerator()
+	gen.Tokens = lex.Tokens
 	gen.Generate()
 
 	// TODO linker job and system call after the assembly file creation
