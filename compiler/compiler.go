@@ -4,7 +4,7 @@ import (
 	"CompilerPlayground/generator"
 	"CompilerPlayground/lexer"
 	"CompilerPlayground/parser"
-	"strings"
+	"path"
 )
 
 type Compiler struct {
@@ -13,12 +13,12 @@ type Compiler struct {
 	directory string
 }
 
-func (compiler *Compiler) SetDirectory(str string) {
-	if !strings.HasSuffix(str, ".mf") {
+func (compiler *Compiler) SetDirectory(dir string) {
+	if path.Ext(dir) != ".mf" {
 		panic("Cannot set a file with incorrect format")
 	}
 
-	compiler.directory = str
+	compiler.directory = dir
 }
 
 func (compiler *Compiler) Compile() {

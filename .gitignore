@@ -45,3 +45,4 @@ go.work
 # Go workspace file
 go.work
 
+as/tmp*.s
