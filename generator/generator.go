@@ -53,6 +53,10 @@ func (generator *Generator) start() {
 			err = generator.generateOperation(lexTok)
 		case lexTok.Tok.IsKeywordOperator():
 			err = generator.generateKeywordOperation(lexTok)
+		case lexTok.Tok == token.DOT:
+			err = generator.generatePopPrint()
+		case lexTok.Tok == token.PRINT:
+			err = generator.generatePrintStack()
 		default:
 			fmt.Println("we came here something is going wrong")
 		}
@@ -192,6 +196,14 @@ func (generator *Generator) generateKeywordOperationRoll() error {
 }
 
 func (generator *Generator) generateKeywordOperationPick() error {
+	return nil
+}
+
+func (generator *Generator) generatePopPrint() error {
+	return nil
+}
+
+func (generator *Generator) generatePrintStack() error {
 	return nil
 }
 
