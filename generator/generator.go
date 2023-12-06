@@ -68,9 +68,9 @@ func (generator *Generator) start() {
 	}
 
 	stringBuilder.Reset()
-	stringBuilder.WriteString("exit:")
+	stringBuilder.WriteString("exit:\n")
 	stringBuilder.WriteString("mov $60, %rax\n")
-	stringBuilder.WriteString("xor %rdi, %rdi")
+	stringBuilder.WriteString("xor %rdi, %rdi\n")
 	stringBuilder.WriteString("syscall\n")
 
 	_, err = generator.writer.WriteString(stringBuilder.String())
@@ -111,7 +111,7 @@ func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
 	stringBuilder.WriteString("popq %rbx\n")
 	stringBuilder.WriteString(operation)
 	stringBuilder.WriteString(" %rbx, %rax\n")
-	stringBuilder.WriteString("pushq %rax\n\n")
+	stringBuilder.WriteString("pushq %rax\n")
 
 	_, err := generator.writer.WriteString(stringBuilder.String())
 
