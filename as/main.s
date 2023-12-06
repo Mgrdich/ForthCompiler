@@ -7,10 +7,10 @@ word:
 _start:
     mov $42, %rsi
     call print
-    /* mov $word, %rsi */
-    /* call printwln */
-    /* mov $42, %rsi */
-    /* call println */
+    mov $word, %rsi
+    call printwln
+    mov $42, %rsi
+    call println
 exit:
     mov $60, %rax
     xor %rdi, %rdi
