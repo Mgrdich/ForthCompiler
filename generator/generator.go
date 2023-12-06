@@ -36,6 +36,10 @@ func (generator *Generator) start() {
 	var err error
 	var stringBuilder strings.Builder
 
+	stringBuilder.WriteString(".section .rodata\n")
+	stringBuilder.WriteString("okWord:\n")
+	stringBuilder.WriteString(".asciz \"ok\" \n\n")
+
 	stringBuilder.WriteString(".section .text\n")
 	stringBuilder.WriteString(".global _start\n")
 	stringBuilder.WriteString("_start:\n")
@@ -206,7 +210,9 @@ func (generator *Generator) generatePopPrint() error {
 	var stringBuilder strings.Builder
 
 	stringBuilder.WriteString("popq %rsi\n")
-	stringBuilder.WriteString("call print\n")
+	stringBuilder.WriteString("call println\n")
+	stringBuilder.WriteString("mov $okWord, %rsi\n")
+	stringBuilder.WriteString("call printwln\n")
 
 	_, err := generator.writer.WriteString(stringBuilder.String())
 
