@@ -260,7 +260,7 @@ func (generator *Generator) generatePrintStack() error {
 	stringBuilder.WriteString("jne loop\n")
 
 	stringBuilder.WriteString("mov $okWord, %rsi\n")
-	stringBuilder.WriteString("call printwln\n")
+	stringBuilder.WriteString("call printw\n")
 	stringBuilder.WriteString("call printeol\n")
 	_, err = generator.writer.WriteString(stringBuilder.String())
 	return err
