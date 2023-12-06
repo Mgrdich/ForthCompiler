@@ -2,10 +2,12 @@ package generator
 
 import (
 	"CompilerPlayground/lexer"
+	"CompilerPlayground/token"
 	"bufio"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 type Generator struct {
@@ -31,23 +33,39 @@ func (generator *Generator) Generate() {
 
 func (generator *Generator) start() {
 	var err error
-	for _, token := range generator.Tokens {
-		if generator.writer.Available() == 0 {
-			err = generator.writer.Flush()
-			if err != nil {
-				panic(err)
-			}
-		}
+	var stringBuilder strings.Builder
 
+	stringBuilder.WriteString(".global _start\n")
+	stringBuilder.WriteString("_start:\n")
+
+	_, err = generator.writer.WriteString(stringBuilder.String())
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, tok := range generator.Tokens {
 		switch {
-		case token.Tok.IsNumber():
-			err = generator.generateNumber(token.Lit)
+		case tok.Tok.IsNumber():
+			err = generator.generateNumber(tok.Lit)
+		case tok.Tok.IsSimpleOperator():
+			err = generator.generateOperation(tok)
+		case tok.Tok.IsKeywordOperator():
 
 		}
 
 		if err != nil {
 			panic(err)
 		}
+	}
+
+	stringBuilder.Reset()
+	stringBuilder.WriteString("mov $60, %rax\n")
+	stringBuilder.WriteString("syscall\n")
+
+	_, err = generator.writer.WriteString(stringBuilder.String())
+	if err != nil {
+		panic(err)
 	}
 
 	err = generator.writer.Flush()
@@ -58,6 +76,35 @@ func (generator *Generator) start() {
 
 func (generator *Generator) generateNumber(numberStr string) error {
 	_, err := generator.writer.WriteString("pushq $" + numberStr + "\n")
+	return err
+}
+
+func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
+	operation := ""
+
+	switch lexToken.Tok {
+	case token.ADD:
+		operation = "addq"
+	case token.SUB:
+		operation = "subq"
+	case token.MUL:
+		operation = "imulq"
+	case token.QUO:
+		panic("Currently we are not supporting division")
+	default:
+		panic("Synchronize with the token file something went wrong")
+	}
+
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString("popq %rax\n")
+	stringBuilder.WriteString("popq %rbx\n")
+	stringBuilder.WriteString(operation)
+	stringBuilder.WriteString(" %rbx, %rax\n")
+	stringBuilder.WriteString("pushq %rax\n\n")
+
+	_, err := generator.writer.WriteString(stringBuilder.String())
+
 	return err
 }
 

@@ -27,10 +27,13 @@ const (
 
 	// Operators and delimiters
 	operatorBeg
+
+	operatorSimpleBeg
 	ADD
 	SUB
 	MUL
 	QUO
+	operatorSimpleEnd
 
 	operatorKeywordBeg
 	REM
@@ -114,6 +117,14 @@ func (tok Token) IsLiteral() bool { return literalBeg < tok && tok < literalEnd 
 // delimiters; it returns false otherwise.
 func (tok Token) IsOperator() bool {
 	return operatorBeg < tok && tok < operatorEnd
+}
+
+func (tok Token) IsSimpleOperator() bool {
+	return operatorSimpleBeg < tok && tok < operatorSimpleEnd
+}
+
+func (tok Token) IsKeywordOperator() bool {
+	return operatorKeywordBeg < tok && tok < operatorKeywordEnd
 }
 
 // IsNumber returns true for tokens corresponding to a numbers

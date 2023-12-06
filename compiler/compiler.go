@@ -23,7 +23,7 @@ func (compiler *Compiler) SetDirectory(dir string) {
 
 func (compiler *Compiler) Compile() {
 	if len(compiler.directory) == 0 {
-		panic("please define the directory")
+		panic("define the directory")
 	}
 
 	lex := lexer.GetLexer(compiler.directory)
