@@ -110,8 +110,8 @@ func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
 	stringBuilder.WriteString("popq %rax\n")
 	stringBuilder.WriteString("popq %rbx\n")
 	stringBuilder.WriteString(operation)
-	stringBuilder.WriteString(" %rbx, %rax\n")
-	stringBuilder.WriteString("pushq %rax\n")
+	stringBuilder.WriteString(" %rax, %rbx\n")
+	stringBuilder.WriteString("pushq %rbx\n")
 
 	_, err := generator.writer.WriteString(stringBuilder.String())
 
