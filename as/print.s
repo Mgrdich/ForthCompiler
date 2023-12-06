@@ -1,15 +1,38 @@
 .section .rodata
-fmt:
+digitln:
    .asciz "%d\n"
+digit:
+   .asciz "%d"
+word:
+    .asciz "%s\n"
 eol:
    .asciz "\n"
 
 .section .text
+
+.globl println
+.globl prints
 .globl print
+
 print:
  push %rax
- #mov  $42, %rsi
- mov $fmt, %rdi
+ mov $digit, %rdi
+ xor %rax, %rax
+ call printf
+ pop %rax
+ ret
+
+println:
+ push %rax
+ mov $digitln, %rdi
+ xor %rax, %rax
+ call printf
+ pop %rax
+ ret
+
+prints:
+ push %rax
+ mov $word, %rdi
  xor %rax, %rax
  call printf
  pop %rax
