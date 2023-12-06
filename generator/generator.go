@@ -4,6 +4,7 @@ import (
 	"CompilerPlayground/lexer"
 	"CompilerPlayground/token"
 	"bufio"
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -44,14 +45,16 @@ func (generator *Generator) start() {
 		panic(err)
 	}
 
-	for _, tok := range generator.Tokens {
+	for _, lexTok := range generator.Tokens {
 		switch {
-		case tok.Tok.IsNumber():
-			err = generator.generateNumber(tok.Lit)
-		case tok.Tok.IsSimpleOperator():
-			err = generator.generateOperation(tok)
-		case tok.Tok.IsKeywordOperator():
-
+		case lexTok.Tok.IsNumber():
+			err = generator.generateNumber(lexTok)
+		case lexTok.Tok.IsSimpleOperator():
+			err = generator.generateOperation(lexTok)
+		case lexTok.Tok.IsKeywordOperator():
+			err = generator.generateKeywordOperation(lexTok)
+		default:
+			fmt.Println("we came here something is going wrong")
 		}
 
 		if err != nil {
@@ -74,8 +77,8 @@ func (generator *Generator) start() {
 	}
 }
 
-func (generator *Generator) generateNumber(numberStr string) error {
-	_, err := generator.writer.WriteString("pushq $" + numberStr + "\n")
+func (generator *Generator) generateNumber(lexToken lexer.LexToken) error {
+	_, err := generator.writer.WriteString("pushq $" + lexToken.Lit + "\n")
 	return err
 }
 
@@ -106,6 +109,90 @@ func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
 	_, err := generator.writer.WriteString(stringBuilder.String())
 
 	return err
+}
+
+func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) error {
+	var err error
+
+	switch lexToken.Tok {
+	case token.MIN:
+		err = generator.generateKeywordOperationMin()
+	case token.MAX:
+		err = generator.generateKeywordOperationMax()
+	case token.NEGATE:
+		err = generator.generateKeywordOperationNegate()
+	case token.ABS:
+		err = generator.generateKeywordOperationAbs()
+	case token.SWAP:
+		err = generator.generateKeywordOperationSwap()
+	case token.ROT:
+		err = generator.generateKeywordOperationRot()
+	case token.DROP:
+		err = generator.generateKeywordOperationDrop()
+	case token.NIP:
+		err = generator.generateKeywordOperationNip()
+	case token.TUCK:
+		err = generator.generateKeywordOperationTuck()
+	case token.OVER:
+		err = generator.generateKeywordOperationOver()
+	case token.ROLL:
+		err = generator.generateKeywordOperationRoll()
+	case token.PICK:
+		err = generator.generateKeywordOperationPick()
+	default:
+		// this is not error case whether some parsing or code
+		fmt.Println("Generation for this code is not written yet", lexToken)
+	}
+
+	return err
+}
+
+func (generator *Generator) generateKeywordOperationMin() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationMax() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationNegate() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationAbs() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationSwap() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationRot() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationDrop() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationNip() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationTuck() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationOver() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationRoll() error {
+	return nil
+}
+
+func (generator *Generator) generateKeywordOperationPick() error {
+	return nil
 }
 
 func (generator *Generator) setName(name string) {
