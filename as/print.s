@@ -3,17 +3,14 @@ digitln:
    .asciz "%d\n"
 digit:
    .asciz "%d"
-word:
+wordln:
     .asciz "%s\n"
 eol:
    .asciz "\n"
 
 .section .text
 
-.globl println
-.globl prints
 .globl print
-
 print:
  push %rax
  mov $digit, %rdi
@@ -22,6 +19,8 @@ print:
  pop %rax
  ret
 
+
+.globl println
 println:
  push %rax
  mov $digitln, %rdi
@@ -30,9 +29,10 @@ println:
  pop %rax
  ret
 
-prints:
+.globl printwln
+printwln:
  push %rax
- mov $word, %rdi
+ mov $wordln, %rdi
  xor %rax, %rax
  call printf
  pop %rax
