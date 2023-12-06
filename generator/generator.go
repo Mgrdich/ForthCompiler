@@ -36,6 +36,7 @@ func (generator *Generator) start() {
 	var err error
 	var stringBuilder strings.Builder
 
+	stringBuilder.WriteString(".section .text\n")
 	stringBuilder.WriteString(".global _start\n")
 	stringBuilder.WriteString("_start:\n")
 
@@ -67,7 +68,9 @@ func (generator *Generator) start() {
 	}
 
 	stringBuilder.Reset()
+	stringBuilder.WriteString("exit:")
 	stringBuilder.WriteString("mov $60, %rax\n")
+	stringBuilder.WriteString("xor %rdi, %rdi")
 	stringBuilder.WriteString("syscall\n")
 
 	_, err = generator.writer.WriteString(stringBuilder.String())
@@ -200,7 +203,14 @@ func (generator *Generator) generateKeywordOperationPick() error {
 }
 
 func (generator *Generator) generatePopPrint() error {
-	return nil
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString("popq %rsi\n")
+	stringBuilder.WriteString("call print\n")
+
+	_, err := generator.writer.WriteString(stringBuilder.String())
+
+	return err
 }
 
 func (generator *Generator) generatePrintStack() error {
