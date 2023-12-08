@@ -13,6 +13,16 @@
         movq %rbp , %r14
         subq $8 , %r14
 
+        # print stack count
+        moveq $p1 , %rsi
+        call printw
+
+        moveq %r12 , %rsi
+        call print
+
+        moveq $p2 , %rsi
+        call printw
+
 loop:
         mov (%r14), %rsi
         call print

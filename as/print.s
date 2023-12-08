@@ -5,6 +5,8 @@ digit:
    .asciz "%d"
 wordln:
     .asciz "%s\n"
+word:
+    .asciz "%s"
 eol:
    .asciz "\n"
 space:
@@ -67,6 +69,18 @@ printwln:
  push %rbp
  mov %rsp, %rbp
  mov $wordln, %rdi
+ xor %rax, %rax
+ xor %rdx, %rdx
+ call printf
+ mov %rbp, %rsp
+ pop %rbp
+ ret
+
+.globl printw
+printw:
+ push %rbp
+ mov %rsp, %rbp
+ mov $word, %rdi
  xor %rax, %rax
  xor %rdx, %rdx
  call printf
