@@ -111,8 +111,7 @@ func (generator *Generator) printOk() error {
 }
 
 func (generator *Generator) generateNumber(lexToken lexer.LexToken) error {
-	_, err := generator.writer.WriteString("pushq $" + lexToken.Lit + "\n")
-	return err
+	return generator.writeString("pushq $" + lexToken.Lit + "\n")
 }
 
 func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
@@ -179,15 +178,54 @@ func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) er
 }
 
 func (generator *Generator) generateKeywordOperationMin() error {
-	return nil
+	var stringsBuilder strings.Builder
+	stringsBuilder.WriteString("popq %rax")
+	stringsBuilder.WriteString("popq %rbx")
+
+	stringsBuilder.WriteString("cmp %rbx, %rax") // %rax < %rbx
+	stringsBuilder.WriteString("JL smaller")
+	stringsBuilder.WriteString("movq %rbx, %rcx")
+	stringsBuilder.WriteString("jmp done")
+
+	stringsBuilder.WriteString("smaller:")
+	stringsBuilder.WriteString("movq %rax, %rcx")
+
+	stringsBuilder.WriteString("done:")
+	stringsBuilder.WriteString("pushq %rbx")
+	stringsBuilder.WriteString("pushq %rax")
+	stringsBuilder.WriteString("pushq %rcx")
+
+	return generator.writeString(stringsBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationMax() error {
-	return nil
+	var stringsBuilder strings.Builder
+	stringsBuilder.WriteString("popq %rax")
+	stringsBuilder.WriteString("popq %rbx")
+
+	stringsBuilder.WriteString("cmp %rbx, %rax") // %rax < %rbx
+	stringsBuilder.WriteString("JG greater")
+	stringsBuilder.WriteString("movq %rbx, %rcx")
+	stringsBuilder.WriteString("jmp done")
+
+	stringsBuilder.WriteString("greater:")
+	stringsBuilder.WriteString("movq %rax, %rcx")
+
+	stringsBuilder.WriteString("done:")
+	stringsBuilder.WriteString("pushq %rbx")
+	stringsBuilder.WriteString("pushq %rax")
+	stringsBuilder.WriteString("pushq %rcx")
+
+	return generator.writeString(stringsBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationNegate() error {
-	return nil
+	var stringBuilder strings.Builder
+	stringBuilder.WriteString("popq %rax\n")
+	stringBuilder.WriteString("neg %rax\n")
+	stringBuilder.WriteString("pushq %rax\n")
+
+	return generator.writeString(stringBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationAbs() error {
