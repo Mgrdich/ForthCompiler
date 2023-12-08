@@ -44,6 +44,10 @@ func (generator *Generator) start() {
 	stringBuilder.WriteString(".global _start\n")
 	stringBuilder.WriteString("_start:\n")
 
+	// stack keepers
+	stringBuilder.WriteString("pushq %rbp\n")
+	stringBuilder.WriteString("movq %rsp , %rbp\n")
+
 	_, err = generator.writer.WriteString(stringBuilder.String())
 
 	if err != nil {
@@ -72,6 +76,11 @@ func (generator *Generator) start() {
 	}
 
 	stringBuilder.Reset()
+
+	// Stack keepers
+	stringBuilder.WriteString("movq %rbp , %rsp\n")
+	stringBuilder.WriteString("popq %rbp\n")
+
 	stringBuilder.WriteString("exit:\n")
 	stringBuilder.WriteString("mov $60, %rax\n")
 	stringBuilder.WriteString("xor %rdi, %rdi\n")
@@ -210,7 +219,11 @@ func (generator *Generator) generatePopPrint() error {
 	var stringBuilder strings.Builder
 
 	stringBuilder.WriteString("popq %rsi\n")
-	stringBuilder.WriteString("call println\n")
+	stringBuilder.WriteString("call print\n")
+
+	stringBuilder.WriteString("call printSpace\n")
+
+	// TODO fix this repetition
 	stringBuilder.WriteString("mov $okWord, %rsi\n")
 	stringBuilder.WriteString("call printwln\n")
 
@@ -220,7 +233,37 @@ func (generator *Generator) generatePopPrint() error {
 }
 
 func (generator *Generator) generatePrintStack() error {
-	return nil
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString("movq $8 , %rcx\n")
+	stringBuilder.WriteString("xor %rdx, %rdx\n")
+	stringBuilder.WriteString("movq %rbp , %rax\n")
+	stringBuilder.WriteString("subq %rsp , %rax\n")
+	stringBuilder.WriteString("idiv %rcx\n")
+	stringBuilder.WriteString("movq %rax , %r12\n")
+	stringBuilder.WriteString("movq %rbp , %r14\n")
+	stringBuilder.WriteString("subq $8 , %r14\n")
+
+	_, err := generator.writer.WriteString(stringBuilder.String())
+	if err != nil {
+		return err
+	}
+	stringBuilder.Reset()
+
+	stringBuilder.WriteString("loop:\n")
+	stringBuilder.WriteString("mov (%r14), %rsi\n")
+	stringBuilder.WriteString("call print\n")
+	stringBuilder.WriteString("call printSpace\n")
+	stringBuilder.WriteString("sub $8, %r14\n")
+	stringBuilder.WriteString("sub $1 ,%r12\n")
+	stringBuilder.WriteString("cmp $0 , %r12\n")
+	stringBuilder.WriteString("jne loop\n")
+
+	stringBuilder.WriteString("mov $okWord, %rsi\n")
+	stringBuilder.WriteString("call printwln\n")
+	stringBuilder.WriteString("call printeol\n")
+	_, err = generator.writer.WriteString(stringBuilder.String())
+	return err
 }
 
 func (generator *Generator) setName(name string) {
