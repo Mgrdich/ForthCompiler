@@ -34,6 +34,4 @@ loop:
         jne loop
 
         movq $okWord, %rsi
-        call printw
-
-        call printeol
+        call printwln

@@ -32,6 +32,11 @@ func (generator *Generator) Generate() {
 	generator.start()
 }
 
+func (generator *Generator) writeString(str string) error {
+	_, err := generator.writer.WriteString(str)
+	return err
+}
+
 func (generator *Generator) start() {
 	var err error
 	var stringBuilder strings.Builder
@@ -52,7 +57,7 @@ func (generator *Generator) start() {
 	stringBuilder.WriteString("pushq %rbp\n")
 	stringBuilder.WriteString("movq %rsp , %rbp\n")
 
-	_, err = generator.writer.WriteString(stringBuilder.String())
+	err = generator.writeString(stringBuilder.String())
 
 	if err != nil {
 		panic(err)
@@ -90,7 +95,7 @@ func (generator *Generator) start() {
 	stringBuilder.WriteString("xor %rdi, %rdi\n")
 	stringBuilder.WriteString("syscall\n")
 
-	_, err = generator.writer.WriteString(stringBuilder.String())
+	err = generator.writeString(stringBuilder.String())
 	if err != nil {
 		panic(err)
 	}
@@ -99,6 +104,10 @@ func (generator *Generator) start() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (generator *Generator) printOk() error {
+	return generator.writeString("movq $okWord, %rsi\n" + "call printwln\n")
 }
 
 func (generator *Generator) generateNumber(lexToken lexer.LexToken) error {
@@ -130,9 +139,7 @@ func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
 	stringBuilder.WriteString(" %rax, %rbx\n")
 	stringBuilder.WriteString("pushq %rbx\n")
 
-	_, err := generator.writer.WriteString(stringBuilder.String())
-
-	return err
+	return generator.writeString(stringBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) error {
@@ -227,13 +234,12 @@ func (generator *Generator) generatePopPrint() error {
 
 	stringBuilder.WriteString("call printSpace\n")
 
-	// TODO fix this repetition
-	stringBuilder.WriteString("mov $okWord, %rsi\n")
-	stringBuilder.WriteString("call printwln\n")
+	err := generator.writeString(stringBuilder.String())
+	if err != nil {
+		return err
+	}
 
-	_, err := generator.writer.WriteString(stringBuilder.String())
-
-	return err
+	return generator.printOk()
 }
 
 func (generator *Generator) generatePrintStack() error {
@@ -248,10 +254,29 @@ func (generator *Generator) generatePrintStack() error {
 	stringBuilder.WriteString("movq %rbp , %r14\n")
 	stringBuilder.WriteString("subq $8 , %r14\n")
 
-	_, err := generator.writer.WriteString(stringBuilder.String())
+	err := generator.writeString(stringBuilder.String())
 	if err != nil {
 		return err
 	}
+
+	stringBuilder.Reset()
+
+	// Print the stack number
+	stringBuilder.WriteString("movq $p1 , %rsi\n")
+	stringBuilder.WriteString("call printw\n")
+
+	stringBuilder.WriteString("movq %r12 , %rsi\n")
+	stringBuilder.WriteString("call print\n")
+
+	stringBuilder.WriteString("movq $p2 , %rsi\n")
+	stringBuilder.WriteString("call printw\n")
+	stringBuilder.WriteString("call printSpace\n")
+
+	err = generator.writeString(stringBuilder.String())
+	if err != nil {
+		return err
+	}
+
 	stringBuilder.Reset()
 
 	stringBuilder.WriteString("loop:\n")
@@ -263,11 +288,12 @@ func (generator *Generator) generatePrintStack() error {
 	stringBuilder.WriteString("cmp $0 , %r12\n")
 	stringBuilder.WriteString("jne loop\n")
 
-	stringBuilder.WriteString("movq $okWord, %rsi\n")
-	stringBuilder.WriteString("call printw\n")
-	stringBuilder.WriteString("call printeol\n")
-	_, err = generator.writer.WriteString(stringBuilder.String())
-	return err
+	err = generator.writeString(stringBuilder.String())
+	if err != nil {
+		return err
+	}
+
+	return generator.printOk()
 }
 
 func (generator *Generator) setName(name string) {
