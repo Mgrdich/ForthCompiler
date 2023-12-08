@@ -30,7 +30,7 @@ print:
 printSpace:
  push %rbp
  mov %rsp, %rbp
- mov $digit, %rdi
+ mov $word, %rdi
  mov $space, %rsi
  xor %rax, %rax
  xor %rdx, %rdx

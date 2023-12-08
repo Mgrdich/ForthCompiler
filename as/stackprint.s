@@ -33,4 +33,7 @@ loop:
         cmp $0 , %r12
         jne loop
 
+        mov $okWord, %rsi
+        call printw
+
         call printeol
