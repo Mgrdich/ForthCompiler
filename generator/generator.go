@@ -38,7 +38,11 @@ func (generator *Generator) start() {
 
 	stringBuilder.WriteString(".section .rodata\n")
 	stringBuilder.WriteString("okWord:\n")
-	stringBuilder.WriteString(".asciz \"ok\" \n\n")
+	stringBuilder.WriteString(".asciz \"ok\" \n")
+	stringBuilder.WriteString("p1:\n")
+	stringBuilder.WriteString(".asciz \"<\"\n")
+	stringBuilder.WriteString("p2:\n")
+	stringBuilder.WriteString(".asciz \">\"\n")
 
 	stringBuilder.WriteString(".section .text\n")
 	stringBuilder.WriteString(".global _start\n")
