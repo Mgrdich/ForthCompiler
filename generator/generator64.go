@@ -15,6 +15,7 @@ const (
 	TEXT
 	GLOBAL
 	_START
+	SYSCALL
 
 	// registers
 	regBegin
@@ -74,6 +75,8 @@ const (
 	RET
 )
 
+var counter = 0
+
 var AsEvalSyntax = map[AsSyntax]string{
 	SECTION: ".section",
 	RODATA:  ".rodata",
@@ -111,18 +114,24 @@ var AsEvalSyntax = map[AsSyntax]string{
 
 	MOVQ: "movq",
 
-	CMPQ:  "cmpq",
-	JMP:   "jmp",
-	JE:    "JE",
-	JNE:   "jne",
-	JS:    "js",
-	JNS:   "jns",
-	JG:    "jg",
-	JL:    "jl",
-	PUSHQ: "pushq",
-	POPQ:  "popq",
-	CALL:  "call",
-	RET:   "ret",
+	CMPQ:    "cmpq",
+	JMP:     "jmp",
+	JE:      "JE",
+	JNE:     "jne",
+	JS:      "js",
+	JNS:     "jns",
+	JG:      "jg",
+	JL:      "jl",
+	PUSHQ:   "pushq",
+	POPQ:    "popq",
+	CALL:    "call",
+	RET:     "ret",
+	SYSCALL: "syscall",
+}
+
+func getUniqueLabel() string {
+	counter++
+	return "l" + strconv.Itoa(counter)
 }
 
 func isRegister(syntax AsSyntax) bool {
@@ -152,68 +161,63 @@ func isJmpControlTransfer(syntax AsSyntax) bool {
 }
 
 func getPushQNum(numString string) string {
-	pushq := AsEvalSyntax[PUSHQ]
-
-	return fmt.Sprintln(pushq, "$"+numString)
+	return fmt.Sprintln(AsEvalSyntax[PUSHQ], "$"+numString)
 }
 
 func getPushQReg(syntax AsSyntax) string {
 	checkRegister(syntax)
 
-	pushq := AsEvalSyntax[PUSHQ]
-	reg := AsEvalSyntax[syntax]
-
-	return fmt.Sprintln(pushq, reg)
+	return fmt.Sprintln(AsEvalSyntax[PUSHQ], AsEvalSyntax[syntax])
 }
 
 func getPopQReg(syntax AsSyntax) string {
 	checkRegister(syntax)
 
-	popq := AsEvalSyntax[POPQ]
-	reg := AsEvalSyntax[syntax]
-
-	return fmt.Sprintln(popq, reg)
+	return fmt.Sprintln(AsEvalSyntax[POPQ], AsEvalSyntax[syntax])
 }
 
 func getUnaryArithmeticReg(operation AsSyntax, reg AsSyntax) string {
 	if !isUnaryArithmetic(operation) {
 		panic("operation should be of unary type")
 	}
-
 	checkRegister(reg)
 
-	op := AsEvalSyntax[operation]
-	r := AsEvalSyntax[reg]
-
-	return fmt.Sprintln(op, r)
+	return fmt.Sprintln(AsEvalSyntax[operation], AsEvalSyntax[reg])
 }
 
 func getBinaryArithmeticRegs(operation AsSyntax, reg AsSyntax, anotherReg AsSyntax) string {
 	if !isBinaryArithmetic(operation) {
 		panic("operation should be of unary type")
 	}
-
 	checkRegister(reg)
 	checkRegister(anotherReg)
 
-	op := AsEvalSyntax[operation]
-	r1 := AsEvalSyntax[reg]
-	r2 := AsEvalSyntax[anotherReg]
-
-	return fmt.Sprintln(op, r1, ",", r2)
+	return fmt.Sprintln(AsEvalSyntax[operation], AsEvalSyntax[reg], ",", AsEvalSyntax[anotherReg])
 }
 
 func getBinaryArithmeticNumToReg(operation AsSyntax, number int, reg AsSyntax) string {
 	if !isBinaryArithmetic(operation) {
 		panic("operation should be of unary type")
 	}
-
 	checkRegister(reg)
 
-	op := AsEvalSyntax[operation]
-	r1 := AsEvalSyntax[reg]
+	return fmt.Sprintln(AsEvalSyntax[operation], "$"+strconv.Itoa(number), ",", AsEvalSyntax[reg])
+}
 
-	return fmt.Sprintln(op, "$"+strconv.Itoa(number), ",", r1)
+func getAddQ(reg AsSyntax, anotherReg AsSyntax) string {
+	return getBinaryArithmeticRegs(ADDQ, reg, anotherReg)
+}
+
+func getSubQ(reg AsSyntax, anotherReg AsSyntax) string {
+	return getBinaryArithmeticRegs(SUBQ, reg, anotherReg)
+}
+
+func getIMulQ(reg AsSyntax, anotherReg AsSyntax) string {
+	return getBinaryArithmeticRegs(IMULQ, reg, anotherReg)
+}
+
+func getXorQ(reg AsSyntax, anotherReg AsSyntax) string {
+	return getBinaryArithmeticRegs(XORQ, reg, anotherReg)
 }
 
 func getLabel(label string) string {
@@ -221,14 +225,14 @@ func getLabel(label string) string {
 }
 
 func getAsciz(label string) string {
-	return AsEvalSyntax[ASCIZ] + "\"" + label + "\"\n"
+	return fmt.Sprintln(AsEvalSyntax[ASCIZ], "\""+label+"\"")
 }
 
-func getSectionROdata(syntax AsSyntax) string {
+func getSectionROdata() string {
 	return fmt.Sprintln(AsEvalSyntax[SECTION], AsEvalSyntax[RODATA])
 }
 
-func getSectionText(syntax AsSyntax) string {
+func getSectionText() string {
 	return fmt.Sprintln(AsEvalSyntax[SECTION], AsEvalSyntax[TEXT])
 }
 
@@ -248,38 +252,26 @@ func getMoveQRegToReg(reg AsSyntax, anotherReg AsSyntax) string {
 	checkRegister(reg)
 	checkRegister(anotherReg)
 
-	movq := AsEvalSyntax[MOVQ]
-	register := AsEvalSyntax[reg]
-	anotherRegister := AsEvalSyntax[anotherReg]
-
-	return fmt.Sprintln(movq, register, ",", anotherRegister)
+	return fmt.Sprintln(AsEvalSyntax[MOVQ], AsEvalSyntax[reg], ",", AsEvalSyntax[anotherReg])
 }
 
 func getMoveQDRefRegToReg(reg AsSyntax, anotherReg AsSyntax) string {
 	checkRegister(reg)
 	checkRegister(anotherReg)
 
-	movq := AsEvalSyntax[MOVQ]
-	register := AsEvalSyntax[reg]
-	anotherRegister := AsEvalSyntax[anotherReg]
-
-	return fmt.Sprintln(movq, "("+register+"),", anotherRegister)
+	return fmt.Sprintln(AsEvalSyntax[MOVQ], "("+AsEvalSyntax[reg]+")", ",", AsEvalSyntax[anotherReg])
 }
 
 func getMoveNumberToReg(number int, reg AsSyntax) string {
 	checkRegister(reg)
 
-	movq := AsEvalSyntax[MOVQ]
-	register := AsEvalSyntax[reg]
-
-	return fmt.Sprintln(movq, getNumber(number), register)
+	return fmt.Sprintln(AsEvalSyntax[MOVQ], getNumber(number), ",", AsEvalSyntax[reg])
 }
 
 func getMoveVarToReg(strVar string, reg AsSyntax) string {
-	movq := AsEvalSyntax[MOVQ]
-	register := AsEvalSyntax[reg]
+	checkRegister(reg)
 
-	return fmt.Sprintln(movq, "$"+strVar, register)
+	return fmt.Sprintln(AsEvalSyntax[MOVQ], "$"+strVar, AsEvalSyntax[reg])
 }
 
 func getPrintSpace() string {
@@ -324,4 +316,15 @@ func getJmp(jmpType AsSyntax, label string) string {
 	}
 
 	return fmt.Sprintln(jmpType, label)
+}
+
+func getCmpQ(reg AsSyntax, anotherReg AsSyntax) string {
+	checkRegister(reg)
+	checkRegister(anotherReg)
+
+	return fmt.Sprintln(AsEvalSyntax[CMPQ], AsEvalSyntax[reg], ",", AsEvalSyntax[anotherReg])
+}
+
+func getSysCall() string {
+	return fmt.Sprint(AsEvalSyntax[SYSCALL])
 }

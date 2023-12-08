@@ -14,6 +14,6 @@ const (
 
 	// Assembly declared variables
 	VAR_okWord        = "okWord"
-	VAR_SymbolGreater = "<"
-	VAR_Symbollees    = ">"
+	VAR_SymbolGreater = "p1"
+	VAR_Symbollees    = "p2"
 )

@@ -41,21 +41,21 @@ func (generator *Generator) start() {
 	var err error
 	var stringBuilder strings.Builder
 
-	stringBuilder.WriteString(".section .rodata\n")
-	stringBuilder.WriteString("okWord:\n")
-	stringBuilder.WriteString(".asciz \"ok\" \n")
-	stringBuilder.WriteString("p1:\n")
-	stringBuilder.WriteString(".asciz \"<\"\n")
-	stringBuilder.WriteString("p2:\n")
-	stringBuilder.WriteString(".asciz \">\"\n")
+	stringBuilder.WriteString(getSectionROdata())
+	stringBuilder.WriteString(getLabel(VAR_okWord))
+	stringBuilder.WriteString(getAsciz("ok"))
+	stringBuilder.WriteString(getLabel(VAR_SymbolGreater))
+	stringBuilder.WriteString(getAsciz("<"))
+	stringBuilder.WriteString(getLabel(VAR_Symbollees))
+	stringBuilder.WriteString(getAsciz(">"))
 
-	stringBuilder.WriteString(".section .text\n")
-	stringBuilder.WriteString(".global _start\n")
-	stringBuilder.WriteString("_start:\n")
+	stringBuilder.WriteString(getSectionText())
+	stringBuilder.WriteString(getGlobalStart())
+	stringBuilder.WriteString(getStart())
 
 	// stack keepers
-	stringBuilder.WriteString("pushq %rbp\n")
-	stringBuilder.WriteString("movq %rsp , %rbp\n")
+	stringBuilder.WriteString(getPushQReg(RBP))
+	stringBuilder.WriteString(getMoveQRegToReg(RSP, RBP))
 
 	err = generator.writeString(stringBuilder.String())
 
@@ -87,13 +87,13 @@ func (generator *Generator) start() {
 	stringBuilder.Reset()
 
 	// Stack keepers
-	stringBuilder.WriteString("movq %rbp , %rsp\n")
-	stringBuilder.WriteString("popq %rbp\n")
+	stringBuilder.WriteString(getMoveQRegToReg(RBP, RSP))
+	stringBuilder.WriteString(getPopQReg(RBP))
 
-	stringBuilder.WriteString("exit:\n")
-	stringBuilder.WriteString("mov $60, %rax\n")
-	stringBuilder.WriteString("xor %rdi, %rdi\n")
-	stringBuilder.WriteString("syscall\n")
+	stringBuilder.WriteString(getLabel("exit"))
+	stringBuilder.WriteString(getMoveNumberToReg(60, RAX))
+	stringBuilder.WriteString(getXorQ(RDI, RDI))
+	stringBuilder.WriteString(getSysCall())
 
 	err = generator.writeString(stringBuilder.String())
 	if err != nil {
@@ -111,32 +111,29 @@ func (generator *Generator) printOk() error {
 }
 
 func (generator *Generator) generateNumber(lexToken lexer.LexToken) error {
-	return generator.writeString("pushq $" + lexToken.Lit + "\n")
+	return generator.writeString(getPushQNum(lexToken.Lit))
 }
 
 func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
-	operation := ""
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString("popq %rax\n")
+	stringBuilder.WriteString("popq %rbx\n")
 
 	switch lexToken.Tok {
 	case token.ADD:
-		operation = "addq"
+		stringBuilder.WriteString(getAddQ(RAX, RBX))
 	case token.SUB:
-		operation = "subq"
+		stringBuilder.WriteString(getSubQ(RAX, RBX))
 	case token.MUL:
-		operation = "imulq"
+		stringBuilder.WriteString(getIMulQ(RAX, RBX))
 	case token.QUO:
 		panic("Currently we are not supporting division")
 	default:
 		panic("Synchronize with the token file something went wrong")
 	}
 
-	var stringBuilder strings.Builder
-
-	stringBuilder.WriteString("popq %rax\n")
-	stringBuilder.WriteString("popq %rbx\n")
-	stringBuilder.WriteString(operation)
-	stringBuilder.WriteString(" %rax, %rbx\n")
-	stringBuilder.WriteString("pushq %rbx\n")
+	stringBuilder.WriteString(getPushQReg(RBX))
 
 	return generator.writeString(stringBuilder.String())
 }
@@ -178,22 +175,25 @@ func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) er
 }
 
 func (generator *Generator) generateKeywordOperationMin() error {
+	lSmaller := getUniqueLabel()
+	lDoneMin := getUniqueLabel()
+
 	var stringsBuilder strings.Builder
-	stringsBuilder.WriteString("popq %rax\n")
-	stringsBuilder.WriteString("popq %rbx\n")
+	stringsBuilder.WriteString(getPopQReg(RAX))
+	stringsBuilder.WriteString(getPopQReg(RBX))
 
-	stringsBuilder.WriteString("cmp %rbx, %rax\n") // %rax < %rbx
-	stringsBuilder.WriteString("JL smaller\n")
-	stringsBuilder.WriteString("movq %rbx, %rcx\n")
-	stringsBuilder.WriteString("jmp doneMin\n")
+	stringsBuilder.WriteString(getCmpQ(RBX, RAX)) // %rax < %rbx
+	stringsBuilder.WriteString(getJmp(JL, lSmaller))
+	stringsBuilder.WriteString(getMoveQRegToReg(RBX, RCX))
+	stringsBuilder.WriteString(getJmp(JMP, lDoneMin))
 
-	stringsBuilder.WriteString("smaller:\n")
-	stringsBuilder.WriteString("movq %rax, %rcx\n")
+	stringsBuilder.WriteString(getLabel(lSmaller))
+	stringsBuilder.WriteString(getMoveQRegToReg(RAX, RCX))
 
-	stringsBuilder.WriteString("doneMin:\n")
-	stringsBuilder.WriteString("pushq %rbx\n")
-	stringsBuilder.WriteString("pushq %rax\n")
-	stringsBuilder.WriteString("pushq %rcx\n")
+	stringsBuilder.WriteString(getLabel(lDoneMin))
+	stringsBuilder.WriteString(getPushQReg(RBX))
+	stringsBuilder.WriteString(getPushQReg(RAX))
+	stringsBuilder.WriteString(getPushQReg(RCX))
 
 	return generator.writeString(stringsBuilder.String())
 }
