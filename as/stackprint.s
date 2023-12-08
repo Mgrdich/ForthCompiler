@@ -25,15 +25,15 @@
 
         call printSpace
 loop:
-        mov (%r14), %rsi
+        movq (%r14), %rsi
         call print
         call printSpace
-        sub $8, %r14
-        sub $1 ,%r12
+        subq $8, %r14
+        subq $1 ,%r12
         cmp $0 , %r12
         jne loop
 
-        mov $okWord, %rsi
+        movq $okWord, %rsi
         call printw
 
         call printeol
