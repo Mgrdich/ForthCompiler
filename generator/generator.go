@@ -179,42 +179,42 @@ func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) er
 
 func (generator *Generator) generateKeywordOperationMin() error {
 	var stringsBuilder strings.Builder
-	stringsBuilder.WriteString("popq %rax")
-	stringsBuilder.WriteString("popq %rbx")
+	stringsBuilder.WriteString("popq %rax\n")
+	stringsBuilder.WriteString("popq %rbx\n")
 
-	stringsBuilder.WriteString("cmp %rbx, %rax") // %rax < %rbx
-	stringsBuilder.WriteString("JL smaller")
-	stringsBuilder.WriteString("movq %rbx, %rcx")
-	stringsBuilder.WriteString("jmp done")
+	stringsBuilder.WriteString("cmp %rbx, %rax\n") // %rax < %rbx
+	stringsBuilder.WriteString("JL smaller\n")
+	stringsBuilder.WriteString("movq %rbx, %rcx\n")
+	stringsBuilder.WriteString("jmp doneMin\n")
 
-	stringsBuilder.WriteString("smaller:")
-	stringsBuilder.WriteString("movq %rax, %rcx")
+	stringsBuilder.WriteString("smaller:\n")
+	stringsBuilder.WriteString("movq %rax, %rcx\n")
 
-	stringsBuilder.WriteString("done:")
-	stringsBuilder.WriteString("pushq %rbx")
-	stringsBuilder.WriteString("pushq %rax")
-	stringsBuilder.WriteString("pushq %rcx")
+	stringsBuilder.WriteString("doneMin:\n")
+	stringsBuilder.WriteString("pushq %rbx\n")
+	stringsBuilder.WriteString("pushq %rax\n")
+	stringsBuilder.WriteString("pushq %rcx\n")
 
 	return generator.writeString(stringsBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationMax() error {
 	var stringsBuilder strings.Builder
-	stringsBuilder.WriteString("popq %rax")
-	stringsBuilder.WriteString("popq %rbx")
+	stringsBuilder.WriteString("popq %rax\n")
+	stringsBuilder.WriteString("popq %rbx\n")
 
-	stringsBuilder.WriteString("cmp %rbx, %rax") // %rax < %rbx
-	stringsBuilder.WriteString("JG greater")
-	stringsBuilder.WriteString("movq %rbx, %rcx")
-	stringsBuilder.WriteString("jmp done")
+	stringsBuilder.WriteString("cmp %rbx, %rax\n") // %rax < %rbx
+	stringsBuilder.WriteString("JG greater\n")
+	stringsBuilder.WriteString("movq %rbx, %rcx\n")
+	stringsBuilder.WriteString("jmp doneMax\n")
 
-	stringsBuilder.WriteString("greater:")
-	stringsBuilder.WriteString("movq %rax, %rcx")
+	stringsBuilder.WriteString("greater:\n")
+	stringsBuilder.WriteString("movq %rax, %rcx\n")
 
-	stringsBuilder.WriteString("done:")
-	stringsBuilder.WriteString("pushq %rbx")
-	stringsBuilder.WriteString("pushq %rax")
-	stringsBuilder.WriteString("pushq %rcx")
+	stringsBuilder.WriteString("doneMax:\n")
+	stringsBuilder.WriteString("pushq %rbx\n")
+	stringsBuilder.WriteString("pushq %rax\n")
+	stringsBuilder.WriteString("pushq %rcx\n")
 
 	return generator.writeString(stringsBuilder.String())
 }
@@ -229,7 +229,20 @@ func (generator *Generator) generateKeywordOperationNegate() error {
 }
 
 func (generator *Generator) generateKeywordOperationAbs() error {
-	return nil
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString("popq %rax\n")
+	stringBuilder.WriteString("movq %rax, %rcx\n")
+	stringBuilder.WriteString("testq %rax\n")
+	stringBuilder.WriteString("JL negative\n")
+	stringBuilder.WriteString("jmp doneAbs\n")
+	stringBuilder.WriteString("negative:\n")
+	stringBuilder.WriteString("negq %rcx\n")
+	stringBuilder.WriteString("doneAbs:\n")
+	stringBuilder.WriteString("pushq %rax\n")
+	stringBuilder.WriteString("pushq %rcx\n")
+
+	return generator.writeString(stringBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationSwap() error {
