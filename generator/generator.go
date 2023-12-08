@@ -222,7 +222,7 @@ func (generator *Generator) generateKeywordOperationMax() error {
 func (generator *Generator) generateKeywordOperationNegate() error {
 	var stringBuilder strings.Builder
 	stringBuilder.WriteString("popq %rax\n")
-	stringBuilder.WriteString("neg %rax\n")
+	stringBuilder.WriteString("negq %rax\n")
 	stringBuilder.WriteString("pushq %rax\n")
 
 	return generator.writeString(stringBuilder.String())
