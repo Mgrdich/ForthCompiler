@@ -54,8 +54,8 @@ func (generator *Generator) start() {
 	stringBuilder.WriteString(getStart())
 
 	// stack keepers
-	stringBuilder.WriteString(getPushQReg(RBP))
-	stringBuilder.WriteString(getMoveQRegToReg(RSP, RBP))
+	stringBuilder.WriteString(getPushQ(RBP))
+	stringBuilder.WriteString(getMovQ(RSP, RBP))
 
 	err = generator.writeString(stringBuilder.String())
 
@@ -87,11 +87,11 @@ func (generator *Generator) start() {
 	stringBuilder.Reset()
 
 	// Stack keepers
-	stringBuilder.WriteString(getMoveQRegToReg(RBP, RSP))
-	stringBuilder.WriteString(getPopQReg(RBP))
+	stringBuilder.WriteString(getMovQ(RBP, RSP))
+	stringBuilder.WriteString(getPopQ(RBP))
 
 	stringBuilder.WriteString(getLabel("exit"))
-	stringBuilder.WriteString(getMoveNumberToReg(60, RAX))
+	stringBuilder.WriteString(getMovQNumber(60, RAX))
 	stringBuilder.WriteString(getXorQ(RDI, RDI))
 	stringBuilder.WriteString(getSysCall())
 
@@ -133,7 +133,7 @@ func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
 		panic("Synchronize with the token file something went wrong")
 	}
 
-	stringBuilder.WriteString(getPushQReg(RBX))
+	stringBuilder.WriteString(getPushQ(RBX))
 
 	return generator.writeString(stringBuilder.String())
 }
@@ -179,68 +179,73 @@ func (generator *Generator) generateKeywordOperationMin() error {
 	lDoneMin := getUniqueLabel()
 
 	var stringsBuilder strings.Builder
-	stringsBuilder.WriteString(getPopQReg(RAX))
-	stringsBuilder.WriteString(getPopQReg(RBX))
+	stringsBuilder.WriteString(getPopQ(RAX))
+	stringsBuilder.WriteString(getPopQ(RBX))
 
 	stringsBuilder.WriteString(getCmpQ(RBX, RAX)) // %rax < %rbx
 	stringsBuilder.WriteString(getJmp(JL, lSmaller))
-	stringsBuilder.WriteString(getMoveQRegToReg(RBX, RCX))
+	stringsBuilder.WriteString(getMovQ(RBX, RCX))
 	stringsBuilder.WriteString(getJmp(JMP, lDoneMin))
 
 	stringsBuilder.WriteString(getLabel(lSmaller))
-	stringsBuilder.WriteString(getMoveQRegToReg(RAX, RCX))
+	stringsBuilder.WriteString(getMovQ(RAX, RCX))
 
 	stringsBuilder.WriteString(getLabel(lDoneMin))
-	stringsBuilder.WriteString(getPushQReg(RBX))
-	stringsBuilder.WriteString(getPushQReg(RAX))
-	stringsBuilder.WriteString(getPushQReg(RCX))
+	stringsBuilder.WriteString(getPushQ(RBX))
+	stringsBuilder.WriteString(getPushQ(RAX))
+	stringsBuilder.WriteString(getPushQ(RCX))
 
 	return generator.writeString(stringsBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationMax() error {
+	lGreater := getUniqueLabel()
+	lDoneMax := getUniqueLabel()
+
 	var stringsBuilder strings.Builder
-	stringsBuilder.WriteString("popq %rax\n")
-	stringsBuilder.WriteString("popq %rbx\n")
+	stringsBuilder.WriteString(getPopQ(RAX))
+	stringsBuilder.WriteString(getPopQ(RBX))
 
-	stringsBuilder.WriteString("cmp %rbx, %rax\n") // %rax < %rbx
-	stringsBuilder.WriteString("JG greater\n")
-	stringsBuilder.WriteString("movq %rbx, %rcx\n")
-	stringsBuilder.WriteString("jmp doneMax\n")
+	stringsBuilder.WriteString(getCmpQ(RBX, RAX)) // %rax < %rbx
+	stringsBuilder.WriteString(getJmp(JG, lGreater))
+	stringsBuilder.WriteString(getMovQ(RBX, RCX))
+	stringsBuilder.WriteString(getJmp(JMP, lDoneMax))
 
-	stringsBuilder.WriteString("greater:\n")
-	stringsBuilder.WriteString("movq %rax, %rcx\n")
+	stringsBuilder.WriteString(getLabel(lGreater))
+	stringsBuilder.WriteString(getMovQ(RAX, RCX))
 
-	stringsBuilder.WriteString("doneMax:\n")
-	stringsBuilder.WriteString("pushq %rbx\n")
-	stringsBuilder.WriteString("pushq %rax\n")
-	stringsBuilder.WriteString("pushq %rcx\n")
+	stringsBuilder.WriteString(getLabel(lDoneMax))
+	stringsBuilder.WriteString(getPushQ(RBX))
+	stringsBuilder.WriteString(getPushQ(RAX))
+	stringsBuilder.WriteString(getPushQ(RCX))
 
 	return generator.writeString(stringsBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationNegate() error {
 	var stringBuilder strings.Builder
-	stringBuilder.WriteString("popq %rax\n")
-	stringBuilder.WriteString("negq %rax\n")
-	stringBuilder.WriteString("pushq %rax\n")
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getNegQ(RAX))
+	stringBuilder.WriteString(getPushQ(RAX))
 
 	return generator.writeString(stringBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationAbs() error {
+	lNegative := getUniqueLabel()
+	lDoneAbs := getUniqueLabel()
 	var stringBuilder strings.Builder
 
-	stringBuilder.WriteString("popq %rax\n")
-	stringBuilder.WriteString("movq %rax, %rcx\n")
-	stringBuilder.WriteString("testq %rax\n")
-	stringBuilder.WriteString("JL negative\n")
-	stringBuilder.WriteString("jmp doneAbs\n")
-	stringBuilder.WriteString("negative:\n")
-	stringBuilder.WriteString("negq %rcx\n")
-	stringBuilder.WriteString("doneAbs:\n")
-	stringBuilder.WriteString("pushq %rax\n")
-	stringBuilder.WriteString("pushq %rcx\n")
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getMovQ(RAX, RCX))
+	stringBuilder.WriteString(getTestQ(RAX, RAX))
+	stringBuilder.WriteString(getJmp(JL, lNegative))
+	stringBuilder.WriteString(getJmp(JMP, lDoneAbs))
+	stringBuilder.WriteString(getLabel(lNegative))
+	stringBuilder.WriteString(getNegQ(RCX))
+	stringBuilder.WriteString(getLabel(lDoneAbs))
+	stringBuilder.WriteString(getPushQ(RAX))
+	stringBuilder.WriteString(getPushQ(RCX))
 
 	return generator.writeString(stringBuilder.String())
 }
@@ -280,10 +285,10 @@ func (generator *Generator) generateKeywordOperationPick() error {
 func (generator *Generator) generatePopPrint() error {
 	var stringBuilder strings.Builder
 
-	stringBuilder.WriteString("popq %rsi\n")
-	stringBuilder.WriteString("call print\n")
+	stringBuilder.WriteString(getPopQ(RSI))
+	stringBuilder.WriteString(getPrint())
 
-	stringBuilder.WriteString("call printSpace\n")
+	stringBuilder.WriteString(getPrintSpace())
 
 	err := generator.writeString(stringBuilder.String())
 	if err != nil {
@@ -296,14 +301,14 @@ func (generator *Generator) generatePopPrint() error {
 func (generator *Generator) generatePrintStack() error {
 	var stringBuilder strings.Builder
 
-	stringBuilder.WriteString("movq $8 , %rcx\n")
-	stringBuilder.WriteString("xor %rdx, %rdx\n")
-	stringBuilder.WriteString("movq %rbp , %rax\n")
-	stringBuilder.WriteString("subq %rsp , %rax\n")
-	stringBuilder.WriteString("idiv %rcx\n")
-	stringBuilder.WriteString("movq %rax , %r12\n")
-	stringBuilder.WriteString("movq %rbp , %r14\n")
-	stringBuilder.WriteString("subq $8 , %r14\n")
+	stringBuilder.WriteString(getMovQNumber(8, RCX))
+	stringBuilder.WriteString(getXorQ(RDX, RDX))
+	stringBuilder.WriteString(getMovQ(RBP, RAX))
+	stringBuilder.WriteString(getSubQ(RSP, RAX))
+	stringBuilder.WriteString(getIDivQ(RCX))
+	stringBuilder.WriteString(getMovQ(RAX, R12))
+	stringBuilder.WriteString(getMovQ(RBP, R14))
+	stringBuilder.WriteString(getSubQNum(8, R14))
 
 	err := generator.writeString(stringBuilder.String())
 	if err != nil {
@@ -313,15 +318,15 @@ func (generator *Generator) generatePrintStack() error {
 	stringBuilder.Reset()
 
 	// Print the stack number
-	stringBuilder.WriteString("movq $p1 , %rsi\n")
-	stringBuilder.WriteString("call printw\n")
+	stringBuilder.WriteString(getMovQVar(VAR_SymbolGreater, RSI))
+	stringBuilder.WriteString(getPrintW())
 
-	stringBuilder.WriteString("movq %r12 , %rsi\n")
-	stringBuilder.WriteString("call print\n")
+	stringBuilder.WriteString(getMovQ(R12, RSI))
+	stringBuilder.WriteString(getPrint())
 
-	stringBuilder.WriteString("movq $p2 , %rsi\n")
-	stringBuilder.WriteString("call printw\n")
-	stringBuilder.WriteString("call printSpace\n")
+	stringBuilder.WriteString(getMovQVar(VAR_Symbollees, RSI))
+	stringBuilder.WriteString(getPrintW())
+	stringBuilder.WriteString(getPrintSpace())
 
 	err = generator.writeString(stringBuilder.String())
 	if err != nil {
@@ -330,14 +335,15 @@ func (generator *Generator) generatePrintStack() error {
 
 	stringBuilder.Reset()
 
-	stringBuilder.WriteString("loop:\n")
-	stringBuilder.WriteString("movq (%r14), %rsi\n")
-	stringBuilder.WriteString("call print\n")
-	stringBuilder.WriteString("call printSpace\n")
-	stringBuilder.WriteString("subq $8, %r14\n")
-	stringBuilder.WriteString("subq $1 ,%r12\n")
-	stringBuilder.WriteString("cmp $0 , %r12\n")
-	stringBuilder.WriteString("jne loop\n")
+	lLoop := getUniqueLabel()
+	stringBuilder.WriteString(getLabel(lLoop))
+	stringBuilder.WriteString(getMovQDRefReg(R14, RSI))
+	stringBuilder.WriteString(getPrint())
+	stringBuilder.WriteString(getPrintSpace())
+	stringBuilder.WriteString(getSubQNum(8, R14))
+	stringBuilder.WriteString(getSubQNum(1, R12))
+	stringBuilder.WriteString(getCmpQNum(0, R12))
+	stringBuilder.WriteString(getJmp(JNE, lLoop))
 
 	err = generator.writeString(stringBuilder.String())
 	if err != nil {

@@ -43,13 +43,13 @@ const (
 	INCQ
 	DECQ
 	NEGQ
+	IDIVQ
 	unaryArithmeticEnd
 
 	binaryArithmeticBeg
 	ADDQ
 	SUBQ
 	IMULQ
-	IDIVQ
 	XORQ
 	LEAQ
 	binaryArithmeticEnd
@@ -60,6 +60,7 @@ const (
 
 	// Control transfer
 	CMPQ
+	TESTQ
 	controlJmpBeg
 	JMP
 	JE
@@ -115,6 +116,7 @@ var AsEvalSyntax = map[AsSyntax]string{
 	MOVQ: "movq",
 
 	CMPQ:    "cmpq",
+	TESTQ:   "testq",
 	JMP:     "jmp",
 	JE:      "JE",
 	JNE:     "jne",
@@ -132,6 +134,14 @@ var AsEvalSyntax = map[AsSyntax]string{
 func getUniqueLabel() string {
 	counter++
 	return "l" + strconv.Itoa(counter)
+}
+
+func getValue(str string) string {
+	return "$" + str
+}
+
+func getNumber(number int) string {
+	return getValue(strconv.Itoa(number))
 }
 
 func isRegister(syntax AsSyntax) bool {
@@ -161,16 +171,16 @@ func isJmpControlTransfer(syntax AsSyntax) bool {
 }
 
 func getPushQNum(numString string) string {
-	return fmt.Sprintln(AsEvalSyntax[PUSHQ], "$"+numString)
+	return fmt.Sprintln(AsEvalSyntax[PUSHQ], getValue(numString))
 }
 
-func getPushQReg(syntax AsSyntax) string {
+func getPushQ(syntax AsSyntax) string {
 	checkRegister(syntax)
 
 	return fmt.Sprintln(AsEvalSyntax[PUSHQ], AsEvalSyntax[syntax])
 }
 
-func getPopQReg(syntax AsSyntax) string {
+func getPopQ(syntax AsSyntax) string {
 	checkRegister(syntax)
 
 	return fmt.Sprintln(AsEvalSyntax[POPQ], AsEvalSyntax[syntax])
@@ -201,7 +211,7 @@ func getBinaryArithmeticNumToReg(operation AsSyntax, number int, reg AsSyntax) s
 	}
 	checkRegister(reg)
 
-	return fmt.Sprintln(AsEvalSyntax[operation], "$"+strconv.Itoa(number), ",", AsEvalSyntax[reg])
+	return fmt.Sprintln(AsEvalSyntax[operation], getNumber(number), ",", AsEvalSyntax[reg])
 }
 
 func getAddQ(reg AsSyntax, anotherReg AsSyntax) string {
@@ -212,12 +222,24 @@ func getSubQ(reg AsSyntax, anotherReg AsSyntax) string {
 	return getBinaryArithmeticRegs(SUBQ, reg, anotherReg)
 }
 
+func getSubQNum(number int, reg AsSyntax) string {
+	return getBinaryArithmeticNumToReg(SUBQ, number, reg)
+}
+
 func getIMulQ(reg AsSyntax, anotherReg AsSyntax) string {
 	return getBinaryArithmeticRegs(IMULQ, reg, anotherReg)
 }
 
+func getIDivQ(reg AsSyntax) string {
+	return getUnaryArithmeticReg(IDIVQ, reg)
+}
+
 func getXorQ(reg AsSyntax, anotherReg AsSyntax) string {
 	return getBinaryArithmeticRegs(XORQ, reg, anotherReg)
+}
+
+func getNegQ(reg AsSyntax) string {
+	return getUnaryArithmeticReg(NEGQ, reg)
 }
 
 func getLabel(label string) string {
@@ -244,34 +266,30 @@ func getStart() string {
 	return AsEvalSyntax[_START] + ":\n"
 }
 
-func getNumber(number int) string {
-	return "$" + strconv.Itoa(number)
-}
-
-func getMoveQRegToReg(reg AsSyntax, anotherReg AsSyntax) string {
+func getMovQ(reg AsSyntax, anotherReg AsSyntax) string {
 	checkRegister(reg)
 	checkRegister(anotherReg)
 
 	return fmt.Sprintln(AsEvalSyntax[MOVQ], AsEvalSyntax[reg], ",", AsEvalSyntax[anotherReg])
 }
 
-func getMoveQDRefRegToReg(reg AsSyntax, anotherReg AsSyntax) string {
+func getMovQDRefReg(reg AsSyntax, anotherReg AsSyntax) string {
 	checkRegister(reg)
 	checkRegister(anotherReg)
 
 	return fmt.Sprintln(AsEvalSyntax[MOVQ], "("+AsEvalSyntax[reg]+")", ",", AsEvalSyntax[anotherReg])
 }
 
-func getMoveNumberToReg(number int, reg AsSyntax) string {
+func getMovQNumber(number int, reg AsSyntax) string {
 	checkRegister(reg)
 
 	return fmt.Sprintln(AsEvalSyntax[MOVQ], getNumber(number), ",", AsEvalSyntax[reg])
 }
 
-func getMoveVarToReg(strVar string, reg AsSyntax) string {
+func getMovQVar(strVar string, reg AsSyntax) string {
 	checkRegister(reg)
 
-	return fmt.Sprintln(AsEvalSyntax[MOVQ], "$"+strVar, AsEvalSyntax[reg])
+	return fmt.Sprintln(AsEvalSyntax[MOVQ], getValue(strVar), ",", AsEvalSyntax[reg])
 }
 
 func getPrintSpace() string {
@@ -282,32 +300,21 @@ func getPrintEOL() string {
 	return fmt.Sprintln(AsEvalSyntax[CALL], FN_Printeol)
 }
 
-func getPrintReg(reg AsSyntax) string {
-	checkRegister(reg)
+func getPrint() string {
 
-	return fmt.Sprintln(getMoveQRegToReg(reg, RSI), "\n", AsEvalSyntax[CALL], FN_Print)
+	return fmt.Sprintln(AsEvalSyntax[CALL], FN_Print)
 }
 
-func getPrintNum(number int) string {
-	return fmt.Sprintln(getMoveNumberToReg(number, RSI), "\n", AsEvalSyntax[CALL], FN_Print)
+func getPrintln() string {
+	return fmt.Sprintln(AsEvalSyntax[CALL], FN_Println)
 }
 
-func getPrintlnReg(reg AsSyntax) string {
-	checkRegister(reg)
-
-	return fmt.Sprintln(getMoveQRegToReg(reg, RSI), "\n", AsEvalSyntax[CALL], FN_Println)
+func getPrintW() string {
+	return fmt.Sprintln(AsEvalSyntax[CALL], FN_Printw)
 }
 
-func getPrintlnNum(number int) string {
-	return fmt.Sprintln(getMoveNumberToReg(number, RSI), "\n", AsEvalSyntax[CALL], FN_Println)
-}
-
-func getPrintW(strVar string) string {
-	return fmt.Sprintln(getMoveVarToReg(strVar, RSI), "\n", AsEvalSyntax[CALL], FN_Printw)
-}
-
-func getPrintWln(strVar string) string {
-	return fmt.Sprintln(getMoveVarToReg(strVar, RSI), "\n", AsEvalSyntax[CALL], FN_Printwln)
+func getPrintWln() string {
+	return fmt.Sprintln(AsEvalSyntax[CALL], FN_Printwln)
 }
 
 func getJmp(jmpType AsSyntax, label string) string {
@@ -315,7 +322,7 @@ func getJmp(jmpType AsSyntax, label string) string {
 		panic("jmpType should be of type Jmp")
 	}
 
-	return fmt.Sprintln(jmpType, label)
+	return fmt.Sprintln(AsEvalSyntax[jmpType], label)
 }
 
 func getCmpQ(reg AsSyntax, anotherReg AsSyntax) string {
@@ -323,6 +330,19 @@ func getCmpQ(reg AsSyntax, anotherReg AsSyntax) string {
 	checkRegister(anotherReg)
 
 	return fmt.Sprintln(AsEvalSyntax[CMPQ], AsEvalSyntax[reg], ",", AsEvalSyntax[anotherReg])
+}
+
+func getCmpQNum(number int, reg AsSyntax) string {
+	checkRegister(reg)
+
+	return fmt.Sprintln(AsEvalSyntax[CMPQ], getNumber(number), ",", AsEvalSyntax[reg])
+}
+
+func getTestQ(reg AsSyntax, anotherReg AsSyntax) string {
+	checkRegister(reg)
+	checkRegister(anotherReg)
+
+	return fmt.Sprintln(AsEvalSyntax[TESTQ], AsEvalSyntax[reg], ",", AsEvalSyntax[anotherReg])
 }
 
 func getSysCall() string {
