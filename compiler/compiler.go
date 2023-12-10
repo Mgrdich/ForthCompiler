@@ -24,7 +24,7 @@ func (compiler *Compiler) SetFile(dir string) {
 	compiler.filePath = dir
 }
 
-func (compiler *Compiler) linkCreateExec(gen *generator.Generator) {
+func (compiler *Compiler) assemblyCompilationAndLinking(gen *generator.Generator) {
 
 	mainObjName := "tmp-main.o"
 	printObjName := "print.o"
@@ -74,7 +74,7 @@ func (compiler *Compiler) Compile() {
 	gen.Tokens = lex.Tokens
 	gen.Generate()
 
-	compiler.linkCreateExec(gen)
+	compiler.assemblyCompilationAndLinking(gen)
 }
 
 func GetCompiler() *Compiler {
