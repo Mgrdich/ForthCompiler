@@ -15,5 +15,9 @@ It gives you an executable with the name `mf`.
 * `mf ./samples/test1.mf` it will compile this file and give you and executable with the same name `test1`
 * Then run it `./test1`
 
+### What is to Come
+* More functionality in the language
+* More Parameters in the CLI
+
 Happy Forthing
 
