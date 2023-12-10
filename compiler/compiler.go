@@ -6,33 +6,60 @@ import (
 	"CompilerPlayground/parser"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"runtime"
 )
 
 type Compiler struct {
-	lexer     lexer.Lexer
-	parser    parser.Parser
-	directory string
+	lexer    lexer.Lexer
+	parser   parser.Parser
+	filePath string
 }
 
-func (compiler *Compiler) SetDirectory(dir string) {
+func (compiler *Compiler) SetFile(dir string) {
 	if path.Ext(dir) != ".mf" {
 		panic("Cannot set a file with incorrect format")
 	}
 
-	compiler.directory = dir
+	compiler.filePath = dir
+}
+
+func (compiler *Compiler) linkCreateExec(gen *generator.Generator) {
+
+	mainObjName := "tmp-main.o"
+	printObjName := "print.o"
+	fileName := path.Base(compiler.filePath)
+	fileNameWithoutExt := fileName[:len(fileName)-len(filepath.Ext(fileName))]
+
+	cmdAsMain := exec.Command("as", "-o", mainObjName, path.Join(gen.Source, gen.GetName()))
+	cmdAsPrint := exec.Command("as", "-o", printObjName, path.Join(gen.Source, "print.s"))
+	cmdLink := exec.Command("ld", "-o", fileNameWithoutExt, mainObjName, printObjName, "-lc", "-dynamic-linker", "/lib64/ld-linux-x86-64.so.2")
+
+	err := cmdAsPrint.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	err = cmdAsMain.Run()
+	if err != nil {
+		panic(err)
+	}
+	err = cmdLink.Run()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (compiler *Compiler) Compile() {
-	if len(compiler.directory) == 0 {
-		panic("define the directory")
+	if len(compiler.filePath) == 0 {
+		panic("define the File path")
 	}
 
 	if runtime.GOOS == "windows" {
 		panic("Compiler does not work on windows")
 	}
 
-	lex := lexer.GetLexer(compiler.directory)
+	lex := lexer.GetLexer(compiler.filePath)
 	lex.Tokenize()
 
 	pars := parser.GetParser()
@@ -47,26 +74,7 @@ func (compiler *Compiler) Compile() {
 	gen.Tokens = lex.Tokens
 	gen.Generate()
 
-	mainObjName := "tmp-main.o"
-	printObjName := "print.o"
-
-	cmdAsMain := exec.Command("as", "-o", mainObjName, path.Join(gen.Source, gen.GetName()))
-	cmdAsPrint := exec.Command("as", "-o", printObjName, path.Join(gen.Source, "print.s"))
-	cmdLink := exec.Command("ld", "-o", "testingExec", mainObjName, printObjName, "-lc", "-dynamic-linker", "/lib64/ld-linux-x86-64.so.2")
-
-	err = cmdAsPrint.Run()
-	if err != nil {
-		panic(err)
-	}
-
-	err = cmdAsMain.Run()
-	if err != nil {
-		panic(err)
-	}
-	err = cmdLink.Run()
-	if err != nil {
-		panic(err)
-	}
+	compiler.linkCreateExec(gen)
 }
 
 func GetCompiler() *Compiler {
