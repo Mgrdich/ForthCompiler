@@ -4,7 +4,6 @@ import (
 	"CompilerPlayground/generator"
 	"CompilerPlayground/lexer"
 	"CompilerPlayground/parser"
-	"fmt"
 	"os/exec"
 	"path"
 	"runtime"
@@ -53,7 +52,7 @@ func (compiler *Compiler) Compile() {
 
 	cmdAsMain := exec.Command("as", "-o", mainObjName, path.Join(gen.Source, gen.GetName()))
 	cmdAsPrint := exec.Command("as", "-o", printObjName, path.Join(gen.Source, "print.s"))
-	cmdLink := exec.Command(fmt.Sprintln("ld", "-o", "testingExec", mainObjName, printObjName, "-lc -dynamic-linker /lib64/ld-linux-x86-64.so.2"))
+	cmdLink := exec.Command("ld", "-o", "testingExec", mainObjName, printObjName, "-lc -dynamic-linker /lib64/ld-linux-x86-64.so.2")
 
 	err = cmdAsPrint.Run()
 	if err != nil {
