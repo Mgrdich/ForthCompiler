@@ -301,13 +301,23 @@ func (generator *Generator) generateKeywordOperationTuck() error {
 }
 
 func (generator *Generator) generateKeywordOperationOver() error {
-	return nil
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getPopQ(RBX))
+	stringBuilder.WriteString(getPushQ(RBX))
+	stringBuilder.WriteString(getPushQ(RAX))
+	stringBuilder.WriteString(getPushQ(RBX))
+
+	return generator.writeString(stringBuilder.String())
 }
 
+// TODO in the Future
 func (generator *Generator) generateKeywordOperationRoll() error {
 	return nil
 }
 
+// TODO in the Future
 func (generator *Generator) generateKeywordOperationPick() error {
 	return nil
 }
