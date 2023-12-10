@@ -8,8 +8,8 @@ https://learnxinyminutes.com/docs/forth/
 * Install `Go` version <= 1.21.1
 * run `make`
 
-It will build the forth compiler that is written with `Go` and give you an executable 
-with the name `mf`
+It will build the forth compiler that is written with `Go`.
+It gives you an executable with the name `mf`.
 
 ### How to test the language
 * `mf ./test1.mf` it will compile this file and give you and executable with the same name `test1`
