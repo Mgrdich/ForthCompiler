@@ -4,8 +4,6 @@ import (
 	"CompilerPlayground/generator"
 	"CompilerPlayground/lexer"
 	"CompilerPlayground/parser"
-	"fmt"
-	"os"
 	"os/exec"
 	"path"
 	"runtime"
@@ -49,28 +47,31 @@ func (compiler *Compiler) Compile() {
 	gen.Tokens = lex.Tokens
 	gen.Generate()
 
-	dir, _ := os.Getwd()
+	//dir, _ := os.Getwd()
 
-	mainObjName := path.Join(dir, "tmp-main.o")
-	printObjName := path.Join(dir, "print.o")
+	//mainObjName := path.Join(dir, "tmp-main.o")
+	//printObjName := path.Join(dir, "print.o")
 
-	cmdAsMain := exec.Command(fmt.Sprintln("as", "-o", mainObjName, path.Join(dir, gen.Source, gen.GetName())))
-	cmdAsPrint := exec.Command(fmt.Sprintln("as", "-o", printObjName, path.Join(dir, gen.Source, "print.s")))
-	cmdLink := exec.Command(fmt.Sprintln("ld", "-o", path.Join(dir, "testingExec"), mainObjName, printObjName, "-lc -dynamic-linker /lib64/ld-linux-x86-64.so.2"))
+	mainObjName := "tmp-main.o"
+	printObjName := "print.o"
 
-	_, err = cmdAsPrint.Output()
+	cmdAsMain := exec.Command("as", "-o", mainObjName, path.Join(gen.Source, gen.GetName()))
+	cmdAsPrint := exec.Command("as", "-o", printObjName, path.Join(gen.Source, "print.s"))
+	//cmdLink := exec.Command(fmt.Sprintln("ld", "-o", path.Join(dir, "testingExec"), mainObjName, printObjName, "-lc -dynamic-linker /lib64/ld-linux-x86-64.so.2"))
+
+	err = cmdAsPrint.Run()
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = cmdAsMain.Output()
+	err = cmdAsMain.Run()
 	if err != nil {
 		panic(err)
 	}
-	_, err = cmdLink.Output()
-	if err != nil {
-		panic(err)
-	}
+	//_, err = cmdLink.Output()
+	//if err != nil {
+	//	panic(err)
+	//}
 }
 
 func GetCompiler() *Compiler {
