@@ -312,8 +312,8 @@ func (generator *Generator) generateKeywordOperationRot() error {
 	stringBuilder.WriteString(getPopQ(RAX))
 	stringBuilder.WriteString(getPopQ(RBX))
 	stringBuilder.WriteString(getPopQ(RCX))
-	stringBuilder.WriteString(getPushQ(RAX))
 	stringBuilder.WriteString(getPushQ(RBX))
+	stringBuilder.WriteString(getPushQ(RAX))
 	stringBuilder.WriteString(getPushQ(RCX))
 
 	return generator.writeString(stringBuilder.String())

@@ -2,12 +2,17 @@
 99 negate .
 -99 abs .
 52 23 max
+.s
+
 52 23 min
+.s
 
 3 dup
 .
 .
+
 .s
+
 2 5 swap
 .s
 .
@@ -16,6 +21,7 @@
 .
 .
 .
+
 .s
 drop
 .s
@@ -23,3 +29,4 @@ drop
 1 2 3 nip
 .
 .
+
