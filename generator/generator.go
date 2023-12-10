@@ -153,16 +153,18 @@ func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) er
 	var err error
 
 	switch lexToken.Tok {
+	case token.MOD:
+		err = generator.generateKeywordOperationMod()
 	case token.MIN:
 		err = generator.generateKeywordOperationMin()
 	case token.MAX:
 		err = generator.generateKeywordOperationMax()
 	case token.NEGATE:
 		err = generator.generateKeywordOperationNegate()
-	case token.MOD:
-		err = generator.generateKeywordOperationMod()
 	case token.ABS:
 		err = generator.generateKeywordOperationAbs()
+	case token.DUP:
+		err = generator.generateKeywordOperationDup()
 	case token.SWAP:
 		err = generator.generateKeywordOperationSwap()
 	case token.ROT:
@@ -180,11 +182,15 @@ func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) er
 	case token.PICK:
 		err = generator.generateKeywordOperationPick()
 	default:
-		// this is not error case whether some parsing or code
-		fmt.Println("Generation for this code is not written yet", lexToken)
+		err = fmt.Errorf("generation for this code is not written yet", lexToken)
 	}
 
 	return err
+}
+
+// generateKeywordOperationPick Currently not supported TODO
+func (generator *Generator) generateKeywordOperationMod() error {
+	return fmt.Errorf("mod Remainder is currently not supported")
 }
 
 // generateKeywordOperationMin pushes the minimum from the top two elements
@@ -275,6 +281,14 @@ func (generator *Generator) generateKeywordOperationAbs() error {
 	return generator.writeString(stringBuilder.String())
 }
 
+func (generator *Generator) generateKeywordOperationDup() error {
+	var stringBuilder strings.Builder
+	stringBuilder.WriteString(getMovQDRefReg(RSP, RAX))
+	stringBuilder.WriteString(getPushQ(RAX))
+
+	return generator.writeString(stringBuilder.String())
+}
+
 // generateKeywordOperationSwap swap the top with the second element:
 //
 //	2 5 swap -> 5 2
@@ -358,11 +372,6 @@ func (generator *Generator) generateKeywordOperationRoll() error {
 // generateKeywordOperationPick Currently not supported TODO
 func (generator *Generator) generateKeywordOperationPick() error {
 	return fmt.Errorf("pick is currently not supported")
-}
-
-// generateKeywordOperationPick Currently not supported TODO
-func (generator *Generator) generateKeywordOperationMod() error {
-	return fmt.Errorf("mod Remainder is currently not supported")
 }
 
 // generatePopPrint pops the top of the stack element and prints it
