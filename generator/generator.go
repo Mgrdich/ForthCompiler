@@ -120,15 +120,15 @@ func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
 	var err error
 
 	stringBuilder.WriteString(getPopQ(RAX))
-	stringBuilder.WriteString(getPopQ(RCX))
+	stringBuilder.WriteString(getPopQ(RBX))
 
 	switch lexToken.Tok {
 	case token.ADD:
-		stringBuilder.WriteString(getAddQ(RAX, RCX))
+		stringBuilder.WriteString(getAddQ(RAX, RBX))
 	case token.SUB:
-		stringBuilder.WriteString(getSubQ(RAX, RCX))
+		stringBuilder.WriteString(getSubQ(RAX, RBX))
 	case token.MUL:
-		stringBuilder.WriteString(getIMulQ(RAX, RCX))
+		stringBuilder.WriteString(getIMulQ(RAX, RBX))
 	case token.QUO:
 		err = generator.generateDivision()
 	default:
