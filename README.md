@@ -4,10 +4,8 @@ minor GForth compiler written in Go. for arch `x64`
 To check GForth functionalities check
 https://learnxinyminutes.com/docs/forth/
 
-## How to use it
-* Install `Go` 1.21.1 
-
 ### How to build the compiler
+* Install `Go` version <= 1.21.1
 * run `make`
 
 It will build the forth compiler that is written with `Go` and give you an executable 
