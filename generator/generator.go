@@ -175,6 +175,9 @@ func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) er
 	return err
 }
 
+// generateKeywordOperationMin pushes the minimum from the top two elements
+//
+// 52 23 min  -> 23
 func (generator *Generator) generateKeywordOperationMin() error {
 	lSmaller := getUniqueLabel()
 	lDoneMin := getUniqueLabel()
@@ -199,6 +202,9 @@ func (generator *Generator) generateKeywordOperationMin() error {
 	return generator.writeString(stringsBuilder.String())
 }
 
+// generateKeywordOperationMax pushes the maximum from the top two elements
+//
+// 52 23 max  -> 52
 func (generator *Generator) generateKeywordOperationMax() error {
 	lGreater := getUniqueLabel()
 	lDoneMax := getUniqueLabel()
@@ -223,6 +229,9 @@ func (generator *Generator) generateKeywordOperationMax() error {
 	return generator.writeString(stringsBuilder.String())
 }
 
+// generateKeywordOperationNegate pushes the negative value of the element that is on top of the stack
+//
+// 99 negate -> -99
 func (generator *Generator) generateKeywordOperationNegate() error {
 	var stringBuilder strings.Builder
 	stringBuilder.WriteString(getPopQ(RAX))
@@ -232,6 +241,9 @@ func (generator *Generator) generateKeywordOperationNegate() error {
 	return generator.writeString(stringBuilder.String())
 }
 
+// generateKeywordOperationNegate pushes the absolute value of the element that is on top of the stack
+//
+// -99 abs -> 99
 func (generator *Generator) generateKeywordOperationAbs() error {
 	lNegative := getUniqueLabel()
 	lDoneAbs := getUniqueLabel()
@@ -251,6 +263,9 @@ func (generator *Generator) generateKeywordOperationAbs() error {
 	return generator.writeString(stringBuilder.String())
 }
 
+// generateKeywordOperationSwap swap the top with the second element:
+//
+//	2 5 swap -> 5 2
 func (generator *Generator) generateKeywordOperationSwap() error {
 	var stringBuilder strings.Builder
 
@@ -262,6 +277,9 @@ func (generator *Generator) generateKeywordOperationSwap() error {
 	return generator.writeString(stringBuilder.String())
 }
 
+// generateKeywordOperationRot rotate the top 3 elements:
+//
+//	6 4 5 rot -> 4 5 6
 func (generator *Generator) generateKeywordOperationRot() error {
 	var stringBuilder strings.Builder
 
@@ -275,10 +293,13 @@ func (generator *Generator) generateKeywordOperationRot() error {
 	return generator.writeString(stringBuilder.String())
 }
 
+// generateKeywordOperationDrop drops the top element from the stack
 func (generator *Generator) generateKeywordOperationDrop() error {
 	return generator.writeString(getPopQ(RAX))
 }
 
+// generateKeywordOperationNip swap the top with the second element
+// 1 2 3 nip -> 1 3
 func (generator *Generator) generateKeywordOperationNip() error {
 	var stringBuilder strings.Builder
 
@@ -289,6 +310,8 @@ func (generator *Generator) generateKeywordOperationNip() error {
 	return generator.writeString(stringBuilder.String())
 }
 
+// generateKeywordOperationTuck duplicate the top item below the second slot
+// 1 2 3 4 tuck -> 1 2 4 3 4
 func (generator *Generator) generateKeywordOperationTuck() error {
 	var stringBuilder strings.Builder
 
@@ -301,6 +324,8 @@ func (generator *Generator) generateKeywordOperationTuck() error {
 	return generator.writeString(stringBuilder.String())
 }
 
+// generateKeywordOperationOver duplicate the top item below the second slot
+// 1 2 3 4 over -> 1 2 3 4 3
 func (generator *Generator) generateKeywordOperationOver() error {
 	var stringBuilder strings.Builder
 
@@ -323,6 +348,7 @@ func (generator *Generator) generateKeywordOperationPick() error {
 	return nil
 }
 
+// generatePopPrint pops the top of the stack element and prints it
 func (generator *Generator) generatePopPrint() error {
 	var stringBuilder strings.Builder
 
@@ -357,6 +383,9 @@ func (generator *Generator) generateTopPrint() error {
 	return generator.printOk()
 }
 
+// generatePrintStack should print the whole stack
+//
+// -> <count> elements
 func (generator *Generator) generatePrintStack() error {
 	var stringBuilder strings.Builder
 
