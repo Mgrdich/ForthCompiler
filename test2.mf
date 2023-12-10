@@ -5,16 +5,19 @@
 52 23 min
 
 3 dup
+.
+.
 2 5 swap
+.s
+.
+.
 6 4 5 rot
 .
 .
 .
-
 .s
 drop
 .s
-
 
 1 2 3 nip
 .
