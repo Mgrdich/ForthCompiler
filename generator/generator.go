@@ -74,7 +74,8 @@ func (generator *Generator) start() {
 		case lexTok.Tok == token.DOT:
 			err = generator.generatePopPrint()
 		case lexTok.Tok == token.PRINT:
-			err = generator.generatePrintStack()
+			//err = generator.generatePrintStack()
+			err = generator.generateTopPrint()
 		default:
 			fmt.Println("we came here something is going wrong")
 		}
@@ -329,6 +330,24 @@ func (generator *Generator) generatePopPrint() error {
 	stringBuilder.WriteString(getPrint())
 
 	stringBuilder.WriteString(getPrintSpace())
+
+	err := generator.writeString(stringBuilder.String())
+	if err != nil {
+		return err
+	}
+
+	return generator.printOk()
+}
+
+func (generator *Generator) generateTopPrint() error {
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString(getPopQ(RSI))
+	stringBuilder.WriteString(getMovQ(RSI, R15))
+	stringBuilder.WriteString(getPrint())
+
+	stringBuilder.WriteString(getPrintSpace())
+	stringBuilder.WriteString(getPushQ(R15))
 
 	err := generator.writeString(stringBuilder.String())
 	if err != nil {
