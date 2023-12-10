@@ -4,6 +4,7 @@ import (
 	"CompilerPlayground/generator"
 	"CompilerPlayground/lexer"
 	"CompilerPlayground/parser"
+	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -48,8 +49,25 @@ func (compiler *Compiler) Compile() {
 	gen.Tokens = lex.Tokens
 	gen.Generate()
 
-	wd, _ := os.Getwd()
-	_, err = exec.Command("/bin/sh", path.Join(wd, "as", "compileLinkAssembly.sh")).Output()
+	dir, _ := os.Getwd()
+
+	mainObjName := path.Join(dir, "tmp-main.o")
+	printObjName := path.Join(dir, "print.o")
+
+	cmdAsMain := exec.Command(fmt.Sprintln("as", "-o", mainObjName, path.Join(dir, gen.Source, gen.GetName())))
+	cmdAsPrint := exec.Command(fmt.Sprintln("as", "-o", printObjName, path.Join(dir, gen.Source, "print.s")))
+	cmdLink := exec.Command(fmt.Sprintln("ld", "-o", path.Join(dir, "testingExec"), mainObjName, printObjName, "-lc -dynamic-linker /lib64/ld-linux-x86-64.so.2"))
+
+	_, err = cmdAsPrint.Output()
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = cmdAsMain.Output()
+	if err != nil {
+		panic(err)
+	}
+	_, err = cmdLink.Output()
 	if err != nil {
 		panic(err)
 	}

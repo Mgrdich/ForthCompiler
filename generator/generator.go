@@ -470,6 +470,10 @@ func (generator *Generator) setName(name string) {
 	generator.name = "tmp_" + name
 }
 
+func (generator *Generator) GetName() string {
+	return generator.name
+}
+
 func GetGenerator() *Generator {
 	return &Generator{Source: "as", name: "tmp_main.s"}
 }
