@@ -6,10 +6,10 @@ import (
 )
 
 func main() {
-	file := os.Args[1]
-	if len(file) == 0 {
+	if len(os.Args) == 1 {
 		panic("path should be defined")
 	}
+	file := os.Args[1]
 
 	cr := compiler.GetCompiler()
 	cr.SetDirectory(file)
