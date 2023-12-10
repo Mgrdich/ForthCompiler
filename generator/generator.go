@@ -298,7 +298,7 @@ func (generator *Generator) generateKeywordOperationSwap() error {
 	stringBuilder.WriteString(getPopQ(RAX))
 	stringBuilder.WriteString(getPopQ(RBX))
 	stringBuilder.WriteString(getPushQ(RAX))
-	stringBuilder.WriteString(getPopQ(RBX))
+	stringBuilder.WriteString(getPushQ(RBX))
 
 	return generator.writeString(stringBuilder.String())
 }
