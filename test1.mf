@@ -10,4 +10,5 @@
 99 negate .
 -99 abs .
 52 23 max .
+.s
 52 23 min .

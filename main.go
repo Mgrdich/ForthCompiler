@@ -4,9 +4,6 @@ import "CompilerPlayground/compiler"
 
 func main() {
 	cr := compiler.GetCompiler()
-	cr.SetDirectory("./testmini.mf")
+	cr.SetDirectory("./test1.mf")
 	cr.Compile()
-
-	//cr.SetDirectory("./test2error.mf")
-	//cr.Compile()
 }
