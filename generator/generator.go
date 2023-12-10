@@ -117,8 +117,8 @@ func (generator *Generator) generateNumber(lexToken lexer.LexToken) error {
 func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
 	var stringBuilder strings.Builder
 
-	stringBuilder.WriteString("popq %rax\n")
-	stringBuilder.WriteString("popq %rbx\n")
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getPopQ(RBX))
 
 	switch lexToken.Tok {
 	case token.ADD:
@@ -251,23 +251,53 @@ func (generator *Generator) generateKeywordOperationAbs() error {
 }
 
 func (generator *Generator) generateKeywordOperationSwap() error {
-	return nil
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getPopQ(RBX))
+	stringBuilder.WriteString(getPushQ(RAX))
+	stringBuilder.WriteString(getPopQ(RBX))
+
+	return generator.writeString(stringBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationRot() error {
-	return nil
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getPopQ(RBX))
+	stringBuilder.WriteString(getPopQ(RCX))
+	stringBuilder.WriteString(getPushQ(RAX))
+	stringBuilder.WriteString(getPushQ(RBX))
+	stringBuilder.WriteString(getPushQ(RCX))
+
+	return generator.writeString(stringBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationDrop() error {
-	return nil
+	return generator.writeString(getPopQ(RAX))
 }
 
 func (generator *Generator) generateKeywordOperationNip() error {
-	return nil
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getPopQ(RBX))
+	stringBuilder.WriteString(getPushQ(RAX))
+
+	return generator.writeString(stringBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationTuck() error {
-	return nil
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getPopQ(RBX))
+	stringBuilder.WriteString(getPushQ(RAX))
+	stringBuilder.WriteString(getPushQ(RBX))
+	stringBuilder.WriteString(getPushQ(RAX))
+
+	return generator.writeString(stringBuilder.String())
 }
 
 func (generator *Generator) generateKeywordOperationOver() error {

@@ -11,6 +11,8 @@ type AsSyntax int
 const (
 	SECTION AsSyntax = iota
 	RODATA
+	DATA
+	QUAD
 	ASCIZ
 	TEXT
 	GLOBAL
@@ -81,6 +83,8 @@ var counter = 0
 var AsEvalSyntax = map[AsSyntax]string{
 	SECTION: ".section",
 	RODATA:  ".rodata",
+	DATA:    ".data",
+	QUAD:    ".quad",
 	ASCIZ:   ".asciz",
 	TEXT:    ".text",
 	GLOBAL:  ".global",
