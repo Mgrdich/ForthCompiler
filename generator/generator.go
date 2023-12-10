@@ -283,7 +283,8 @@ func (generator *Generator) generateKeywordOperationAbs() error {
 
 func (generator *Generator) generateKeywordOperationDup() error {
 	var stringBuilder strings.Builder
-	stringBuilder.WriteString(getMovQDRefReg(RSP, RAX))
+	stringBuilder.WriteString(getPopQ(RAX))
+	stringBuilder.WriteString(getPushQ(RAX))
 	stringBuilder.WriteString(getPushQ(RAX))
 
 	return generator.writeString(stringBuilder.String())
