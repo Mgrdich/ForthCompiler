@@ -4,6 +4,8 @@ import (
 	"CompilerPlayground/generator"
 	"CompilerPlayground/lexer"
 	"CompilerPlayground/parser"
+	"fmt"
+	"os/exec"
 	"path"
 )
 
@@ -41,7 +43,10 @@ func (compiler *Compiler) Compile() {
 	gen.Tokens = lex.Tokens
 	gen.Generate()
 
-	// TODO linker job and system call after the assembly file creation
+	_, err = exec.Command("/bin/sh", "./as/compileLinkAssembly.sh").Output()
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
 }
 
 func GetCompiler() *Compiler {
