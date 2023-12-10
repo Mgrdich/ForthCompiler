@@ -213,8 +213,6 @@ func (generator *Generator) generateKeywordOperationMin() error {
 	stringsBuilder.WriteString(getMovQ(RAX, RCX))
 
 	stringsBuilder.WriteString(getLabel(lDoneMin))
-	stringsBuilder.WriteString(getPushQ(RBX))
-	stringsBuilder.WriteString(getPushQ(RAX))
 	stringsBuilder.WriteString(getPushQ(RCX))
 
 	return generator.writeString(stringsBuilder.String())
@@ -240,8 +238,6 @@ func (generator *Generator) generateKeywordOperationMax() error {
 	stringsBuilder.WriteString(getMovQ(RAX, RCX))
 
 	stringsBuilder.WriteString(getLabel(lDoneMax))
-	stringsBuilder.WriteString(getPushQ(RBX))
-	stringsBuilder.WriteString(getPushQ(RAX))
 	stringsBuilder.WriteString(getPushQ(RCX))
 
 	return generator.writeString(stringsBuilder.String())
@@ -275,7 +271,6 @@ func (generator *Generator) generateKeywordOperationAbs() error {
 	stringBuilder.WriteString(getLabel(lNegative))
 	stringBuilder.WriteString(getNegQ(RCX))
 	stringBuilder.WriteString(getLabel(lDoneAbs))
-	stringBuilder.WriteString(getPushQ(RAX))
 	stringBuilder.WriteString(getPushQ(RCX))
 
 	return generator.writeString(stringBuilder.String())
