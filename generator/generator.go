@@ -365,6 +365,7 @@ func (generator *Generator) generatePopPrint() error {
 	return generator.printOk()
 }
 
+// generateTopPrint prints top of the stack element
 func (generator *Generator) generateTopPrint() error {
 	var stringBuilder strings.Builder
 
@@ -384,7 +385,7 @@ func (generator *Generator) generateTopPrint() error {
 }
 
 // generatePrintStack should print the whole stack
-//
+// TODO current implementation is corrupted and it is corrupting the stack with the stack pointer
 // -> <count> elements
 func (generator *Generator) generatePrintStack() error {
 	var stringBuilder strings.Builder
