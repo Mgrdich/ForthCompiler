@@ -4,9 +4,10 @@ import (
 	"CompilerPlayground/generator"
 	"CompilerPlayground/lexer"
 	"CompilerPlayground/parser"
-	"fmt"
+	"os"
 	"os/exec"
 	"path"
+	"runtime"
 )
 
 type Compiler struct {
@@ -28,6 +29,10 @@ func (compiler *Compiler) Compile() {
 		panic("define the directory")
 	}
 
+	if runtime.GOOS == "windows" {
+		panic("Compiler does not work on windows")
+	}
+
 	lex := lexer.GetLexer(compiler.directory)
 	lex.Tokenize()
 
@@ -43,9 +48,10 @@ func (compiler *Compiler) Compile() {
 	gen.Tokens = lex.Tokens
 	gen.Generate()
 
-	_, err = exec.Command("/bin/sh", "./as/compileLinkAssembly.sh").Output()
+	wd, _ := os.Getwd()
+	_, err = exec.Command("/bin/sh", path.Join(wd, "as", "compileLinkAssembly.sh")).Output()
 	if err != nil {
-		fmt.Printf("error %s", err)
+		panic(err)
 	}
 }
 
