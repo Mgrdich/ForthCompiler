@@ -23,6 +23,31 @@ popq %rax
 popq %rbx
 addq %rax , %rbx
 pushq %rbx
+movq $8 , %rcx
+xorq %rdx , %rdx
+movq %rbp , %rax
+subq %rsp , %rax
+idivq %rcx
+movq %rax , %r12
+movq %rbp , %r14
+subq $8 , %r14
+movq $p1 , %rsi
+call printw
+movq %r12 , %rsi
+call print
+movq $p2 , %rsi
+call printw
+call printSpace
+l1:
+movq (%r14) , %rsi
+call print
+call printSpace
+subq $8 , %r14
+subq $1 , %r12
+cmpq $0 , %r12
+jne l1
+movq $okWord, %rsi
+call printwln
 popq %rsi
 call print
 call printSpace
@@ -37,6 +62,31 @@ pushq %rbx
 popq %rsi
 call print
 call printSpace
+movq $okWord, %rsi
+call printwln
+movq $8 , %rcx
+xorq %rdx , %rdx
+movq %rbp , %rax
+subq %rsp , %rax
+idivq %rcx
+movq %rax , %r12
+movq %rbp , %r14
+subq $8 , %r14
+movq $p1 , %rsi
+call printw
+movq %r12 , %rsi
+call print
+movq $p2 , %rsi
+call printw
+call printSpace
+l2:
+movq (%r14) , %rsi
+call print
+call printSpace
+subq $8 , %r14
+subq $1 , %r12
+cmpq $0 , %r12
+jne l2
 movq $okWord, %rsi
 call printwln
 pushq $1360
@@ -65,14 +115,14 @@ call print
 movq $p2 , %rsi
 call printw
 call printSpace
-l1:
+l3:
 movq (%r14) , %rsi
 call print
 call printSpace
 subq $8 , %r14
 subq $1 , %r12
 cmpq $0 , %r12
-jne l1
+jne l3
 movq $okWord, %rsi
 call printwln
 movq %rbp , %rsp
