@@ -12,7 +12,7 @@ It will build the forth compiler that is written with `Go`.
 It gives you an executable with the name `mf`.
 
 ### How to test the language
-* `mf ./test1.mf` it will compile this file and give you and executable with the same name `test1`
+* `mf ./samples/test1.mf` it will compile this file and give you and executable with the same name `test1`
 * Then run it `./test1`
 
 Happy Forthing
