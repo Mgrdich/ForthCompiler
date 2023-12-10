@@ -4,8 +4,7 @@ minor GForth compiler written in Go.
 Supported Architectures
 * `x64`
 
-To check GForth functionalities check
-https://learnxinyminutes.com/docs/forth/
+GForth functionalities can be checked https://learnxinyminutes.com/docs/forth/
 
 ### How to build the compiler
 * Install `Go` version <= 1.21.1
