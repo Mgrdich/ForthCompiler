@@ -1,5 +1,5 @@
-# Forth Like language minor Compiler
-minor GForth compiler written in Go.
+# GForth Compiler
+minor GForth compiler written in Go. for arch `x64`
 
 To check GForth functionalities check
 https://learnxinyminutes.com/docs/forth/
