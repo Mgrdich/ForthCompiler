@@ -117,26 +117,36 @@ func (generator *Generator) generateNumber(lexToken lexer.LexToken) error {
 
 func (generator *Generator) generateOperation(lexToken lexer.LexToken) error {
 	var stringBuilder strings.Builder
+	var err error
 
 	stringBuilder.WriteString(getPopQ(RAX))
-	stringBuilder.WriteString(getPopQ(RBX))
+	stringBuilder.WriteString(getPopQ(RCX))
 
 	switch lexToken.Tok {
 	case token.ADD:
-		stringBuilder.WriteString(getAddQ(RAX, RBX))
+		stringBuilder.WriteString(getAddQ(RAX, RCX))
 	case token.SUB:
-		stringBuilder.WriteString(getSubQ(RAX, RBX))
+		stringBuilder.WriteString(getSubQ(RAX, RCX))
 	case token.MUL:
-		stringBuilder.WriteString(getIMulQ(RAX, RBX))
+		stringBuilder.WriteString(getIMulQ(RAX, RCX))
 	case token.QUO:
-		panic("Currently we are not supporting division")
+		err = generator.generateDivision()
 	default:
-		panic("Synchronize with the token file something went wrong")
+		err = fmt.Errorf("synchronize with the token file something went wrong")
+	}
+
+	if err != nil {
+		panic(err)
 	}
 
 	stringBuilder.WriteString(getPushQ(RBX))
 
 	return generator.writeString(stringBuilder.String())
+}
+
+// generateDivision Currently not supported TODO
+func (generator *Generator) generateDivision() error {
+	return fmt.Errorf("division is currently not supported")
 }
 
 func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) error {
@@ -149,6 +159,8 @@ func (generator *Generator) generateKeywordOperation(lexToken lexer.LexToken) er
 		err = generator.generateKeywordOperationMax()
 	case token.NEGATE:
 		err = generator.generateKeywordOperationNegate()
+	case token.MOD:
+		err = generator.generateKeywordOperationMod()
 	case token.ABS:
 		err = generator.generateKeywordOperationAbs()
 	case token.SWAP:
@@ -338,14 +350,19 @@ func (generator *Generator) generateKeywordOperationOver() error {
 	return generator.writeString(stringBuilder.String())
 }
 
-// TODO in the Future
+// generateKeywordOperationRoll Currently not supported TODO
 func (generator *Generator) generateKeywordOperationRoll() error {
-	return nil
+	return fmt.Errorf("roll is currently not supported")
 }
 
-// TODO in the Future
+// generateKeywordOperationPick Currently not supported TODO
 func (generator *Generator) generateKeywordOperationPick() error {
-	return nil
+	return fmt.Errorf("pick is currently not supported")
+}
+
+// generateKeywordOperationPick Currently not supported TODO
+func (generator *Generator) generateKeywordOperationMod() error {
+	return fmt.Errorf("mod Remainder is currently not supported")
 }
 
 // generatePopPrint pops the top of the stack element and prints it

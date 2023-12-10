@@ -36,7 +36,7 @@ const (
 	operatorSimpleEnd
 
 	operatorKeywordBeg
-	REM
+	MOD
 	NEGATE
 	ABS
 	MAX
@@ -69,7 +69,7 @@ var tokens = [...]string{
 	SUB:       "-",
 	MUL:       "*",
 	QUO:       "/",
-	REM:       "mod",
+	MOD:       "mod",
 	NEGATE:    "negate",
 	ABS:       "abs",
 	MAX:       "max",
