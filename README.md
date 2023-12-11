@@ -20,6 +20,7 @@ It gives you an executable with the name `mf`.
 ### What's to Come
 * More functionality in the language
 * More Parameters in the CLI
+* Writing test suites
 
 Happy Forthing
 
