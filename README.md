@@ -24,3 +24,24 @@ It gives you an executable with the name `mf`.
 
 Happy Forthing
 
+
+### Supported Operations
+
+Take each line as a clean slate
+
+* Stack push Eg: `1 2 3` 
+* Stack print `1 2 3` -> `<3> 1 2 3 ok`
+* Stack Pop and print `1 2 3 .` -> `3`
+* Arithmetic Operation Addition `1 2 + .` -> `3`
+* Arithmetic Operation Subtraction `1360 23 - .` -> `1337 ok`
+* Arithmetic Operation Multiplication `6 7 * .` -> `42 ok`
+* Keyword Operation Negation `99 negate .` -> `-99 ok`
+* Keyword Operation Absolute `-99 abs .` -> `99 ok`
+* Keyword Operation Maximum `52 26 max .` -> `52 ok`
+* Keyword Operation Minimum `52 26 min .` -> `26 ok`
+* Keyword Operation Duplication `3 dup .s` -> `<2> 3 3 ok`
+* Keyword Operation Swap `3 5 swap .s` -> `<2> 5 3 ok`
+* Keyword Operation Rotate `6 5 4 rot .s` -> `<3> 4 5 6`
+* Keyword Operation Nip `6 5 4 nip .s` -> `<2> 6 4`
+* Keyword Operation Tuck `1 2 3 4 tuck .s` -> `<5> 1 2 4 3 4`
+* Keyword Operation Over `1 2 3 4 over .s` -> `<5> 1 2 3 4 3`
