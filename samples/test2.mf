@@ -8,26 +8,18 @@
 .s
 
 3 dup
-.
-.
-
 .s
 
 2 5 swap
 .s
-.
-.
 
 6 4 5 rot
-.
-.
-.
+.s
 
 .s
 drop
 .s
 
 1 2 3 nip
-.
-.
+.s
 
