@@ -162,7 +162,7 @@ printw:
     push %rbp
     mov %rsp, %rbp
 
-    mov $wordln, %rdi
+    mov $word, %rdi
     movq $1, %rax
     xor %rdx, %rdx
 

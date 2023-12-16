@@ -74,8 +74,7 @@ func (generator *Generator) start() {
 		case lexTok.Tok == token.DOT:
 			err = generator.generatePopPrint()
 		case lexTok.Tok == token.PRINT:
-			//err = generator.generatePrintStack()
-			err = generator.generateTopPrint()
+			err = generator.generatePrintStack()
 		default:
 			fmt.Println("we came here something is going wrong")
 		}
@@ -406,7 +405,6 @@ func (generator *Generator) generateTopPrint() error {
 }
 
 // generatePrintStack should print the whole stack
-// TODO current implementation is corrupted and it is corrupting the stack with the stack pointer
 // -> <count> elements
 func (generator *Generator) generatePrintStack() error {
 	var stringBuilder strings.Builder
