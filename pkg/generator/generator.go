@@ -1,8 +1,8 @@
 package generator
 
 import (
-	"CompilerPlayground/lexer"
-	"CompilerPlayground/token"
+	"ForthCompiler/pkg/lexer"
+	"ForthCompiler/pkg/token"
 	"bufio"
 	"fmt"
 	"os"

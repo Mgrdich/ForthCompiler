@@ -1,9 +1,10 @@
 package compiler
 
 import (
-	"CompilerPlayground/generator"
-	"CompilerPlayground/lexer"
-	"CompilerPlayground/parser"
+	"ForthCompiler/pkg/generator"
+	"ForthCompiler/pkg/lexer"
+	"ForthCompiler/pkg/parser"
+	"fmt"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -55,12 +56,9 @@ func (compiler *Compiler) Compile() {
 		panic("define the File path")
 	}
 
-	if runtime.GOOS == "windows" {
-		panic("Compiler does not work on windows")
-	}
-
 	lex := lexer.GetLexer(compiler.filePath)
 	lex.Tokenize()
+	fmt.Println("Tokenized Successfully")
 
 	pars := parser.GetParser()
 	pars.Tokens = lex.Tokens
@@ -69,11 +67,19 @@ func (compiler *Compiler) Compile() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("Parsed Successfully")
 
 	gen := generator.GetGenerator()
 	gen.Tokens = lex.Tokens
 	gen.Generate()
 
+	if runtime.GOOS != "linux" {
+		panic("Compiler does not work on this operating system")
+	}
+
+	if runtime.GOARCH != "amd64" {
+		panic("Computer architecture is not currently supported")
+	}
 	compiler.assemblyCompilationAndLinking(gen)
 }
 

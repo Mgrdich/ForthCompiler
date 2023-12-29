@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"CompilerPlayground/lexer"
+	"ForthCompiler/pkg/lexer"
 	"errors"
 	"strings"
 )

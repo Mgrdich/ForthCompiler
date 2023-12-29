@@ -1,7 +1,7 @@
 package main
 
 import (
-	"CompilerPlayground/compiler"
+	"ForthCompiler/pkg/compiler"
 	"os"
 )
 

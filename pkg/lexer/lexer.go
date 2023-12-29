@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"CompilerPlayground/token"
+	"ForthCompiler/pkg/token"
 	"bufio"
 	"fmt"
 	"os"
@@ -59,8 +59,6 @@ func (lex *Lexer) scanStart() {
 			Lit: lit,
 		})
 	}
-
-	fmt.Println(lex.Tokens)
 }
 
 func convertByteToRune(bytes []byte) ([]rune, error) {
