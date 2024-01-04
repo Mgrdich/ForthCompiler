@@ -3,8 +3,6 @@ package token
 // Token is the set of lexical tokens of our created language
 type Token int
 
-// The list of tokens.
-
 const (
 	// Special tokens
 

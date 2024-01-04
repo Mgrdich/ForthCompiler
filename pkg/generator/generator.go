@@ -472,6 +472,6 @@ func (generator *Generator) GetName() string {
 	return generator.name
 }
 
-func GetGenerator() *Generator {
+func NewGenerator() *Generator {
 	return &Generator{Source: "as", name: "tmp_main.s"}
 }

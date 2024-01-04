@@ -56,11 +56,11 @@ func (compiler *Compiler) Compile() {
 		panic("define the File path")
 	}
 
-	lex := lexer.GetLexer(compiler.filePath)
+	lex := lexer.NewLexer(compiler.filePath)
 	lex.Tokenize()
 	fmt.Println("Tokenized Successfully")
 
-	pars := parser.GetParser()
+	pars := parser.NewParser()
 	pars.Tokens = lex.Tokens
 	err := pars.Parse()
 
@@ -69,7 +69,7 @@ func (compiler *Compiler) Compile() {
 	}
 	fmt.Println("Parsed Successfully")
 
-	gen := generator.GetGenerator()
+	gen := generator.NewGenerator()
 	gen.Tokens = lex.Tokens
 	gen.Generate()
 

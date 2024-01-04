@@ -30,6 +30,6 @@ func (parser *Parser) Parse() error {
 	return errors.New("Illegal Tokens: " + errorBuffer.String()[:errorBuffer.Len()-1])
 }
 
-func GetParser() *Parser {
+func NewParser() *Parser {
 	return &Parser{}
 }

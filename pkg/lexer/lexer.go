@@ -216,7 +216,7 @@ func (lex *Lexer) getNextToken() (token.Token, string) {
 	return tok, lex.scanner.Text()
 }
 
-func GetLexer(directory string) *Lexer {
+func NewLexer(directory string) *Lexer {
 	if len(directory) == 0 {
 		panic("directory is not defined")
 	}
